@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "sharppickle.Sample": {
+      "commandName": "Project",
+      "commandLineArgs": "\"D:\\Kaskadee\\Downloads\\data.rpa\""
+    }
+  }
+}
