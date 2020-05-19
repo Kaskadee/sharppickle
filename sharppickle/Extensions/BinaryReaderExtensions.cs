@@ -41,7 +41,7 @@ namespace sharppickle.Extensions {
         /// <param name="reader">The <see cref="BinaryReader"/> to read the integer from.</param>
         /// <returns>The read string with escaped characters.</returns>
         public static string ReadUnicodeString(this BinaryReader reader) {
-            var str = reader.BaseStream.ReadLine(false);
+            var str = reader.BaseStream.ReadLine();
             return Regex.Replace(str, @"[^\x00-\x7F]", c => $@"\u{(int) c.Value[0]:x4}");
         }
     }
