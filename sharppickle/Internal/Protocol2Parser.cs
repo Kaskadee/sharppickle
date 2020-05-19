@@ -12,7 +12,6 @@ namespace sharppickle.Internal {
     ///     Protocol 2 includes PROTO, NEWOBJ, EXT1, EXT2, EXT4, TUPLE1, TUPLE2, TUPLE3, NEWTRUE, NEWFALSE, LONG1, LONG4.
     /// </summary>
     internal static class Protocol2Parser {
-
         /// <summary>
         ///     Identifies the pickle protocol and returns the protocol version.
         /// </summary>

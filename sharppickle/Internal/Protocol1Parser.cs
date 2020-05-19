@@ -396,8 +396,12 @@ namespace sharppickle.Internal {
         public static void SetItems(Stack stack) {
             var items = PopMark(stack);
             var dict = stack.Peek<IDictionary<object, object>>();
-            for (var i = 0; i < items.Count; i += 2)
-                dict[items[i]] = items[i + 1];
+            for (var i = 0; i < items.Count; i += 2) {
+                if(!dict.ContainsKey(items[i]))
+                    dict.Add(items[i], items[i + 1]);
+                else
+                    dict[items[i]] = items[i + 1];
+            }
         }
 
         #endregion
