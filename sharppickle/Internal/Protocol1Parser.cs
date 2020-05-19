@@ -92,6 +92,8 @@ namespace sharppickle.Internal {
         /// <param name="stream">The <see cref="Stream"/> to read the <see langword="long"/> from.</param>
         public static void PushLong(Stack stack, Stream stream) {
             var s = stream.ReadLine(false);
+            if (s.EndsWith("L", StringComparison.OrdinalIgnoreCase))
+                s = s.Substring(0, s.Length - 1);
             stack.Push(long.Parse(s, NumberStyles.Any, CultureInfo.InvariantCulture));
         }
 
