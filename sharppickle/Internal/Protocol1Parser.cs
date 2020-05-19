@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -103,10 +103,10 @@ namespace sharppickle.Internal {
         public static void PushInteger(Stack stack, Stream stream) {
             var s = stream.ReadLine(false);
             switch (s) {
-                case "01\n":
+                case "01":
                     stack.Push(true);
                     return;
-                case "00\n":
+                case "00":
                     stack.Push(false);
                     return;
                 default:
