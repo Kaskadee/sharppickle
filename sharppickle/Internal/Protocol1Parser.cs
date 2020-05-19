@@ -386,7 +386,10 @@ namespace sharppickle.Internal {
             var value = stack.Pop();
             var key = stack.Pop();
             var dict = stack.Peek<IDictionary<object, object>>();
-            dict[key] = value;
+            if(!dict.ContainsKey(key))
+                dict.Add(key, value);
+            else 
+                dict[key] = value;
         }
 
         /// <summary>
