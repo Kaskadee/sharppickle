@@ -155,7 +155,7 @@ namespace sharppickle.Internal {
             var str = stream.ReadLine();
             if (str.Length < 2 || str[0] != str.Last() || str[0] != '\'')
                 throw new UnpicklingException("The STRING op-code argument must be quoted");
-            stack.Push(str);
+            stack.Push(str.Substring(1, str.Length - 2));
         }
 
         /// <summary>
