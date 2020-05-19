@@ -154,7 +154,7 @@ namespace sharppickle {
                     Protocol1Parser.PushBinaryString(stack, br, Encoding);
                     continue;
                 } else if (opCode == PickleOpCodes.ShortBinString) {
-                    Protocol1Parser.PushBinaryString(stack, br, Encoding);
+                    Protocol1Parser.PushShortBinaryString(stack, br, Encoding);
                     continue;
                 }
                 // Handle special op-codes.
