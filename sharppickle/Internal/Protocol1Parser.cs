@@ -71,7 +71,7 @@ namespace sharppickle.Internal {
         /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
         /// <param name="stream">The <see cref="Stream"/> to read the <see langword="float"/> from.</param>
         public static void PushFloat(Stack stack, Stream stream) {
-            var s = stream.ReadLine(false);
+            var s = stream.ReadLine();
             stack.Push(float.Parse(s, NumberStyles.Any, CultureInfo.InvariantCulture));
         }
 
@@ -91,7 +91,7 @@ namespace sharppickle.Internal {
         /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
         /// <param name="stream">The <see cref="Stream"/> to read the <see langword="long"/> from.</param>
         public static void PushLong(Stack stack, Stream stream) {
-            var s = stream.ReadLine(false);
+            var s = stream.ReadLine();
             if (s.EndsWith("L", StringComparison.OrdinalIgnoreCase))
                 s = s.Substring(0, s.Length - 1);
             stack.Push(long.Parse(s, NumberStyles.Any, CultureInfo.InvariantCulture));
@@ -103,7 +103,7 @@ namespace sharppickle.Internal {
         /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
         /// <param name="stream">The <see cref="Stream"/> to read the <see langword="int"/> or <see langword="bool"/> from.</param>
         public static void PushInteger(Stack stack, Stream stream) {
-            var s = stream.ReadLine(false);
+            var s = stream.ReadLine();
             switch (s) {
                 case "01":
                     stack.Push(true);
@@ -152,7 +152,7 @@ namespace sharppickle.Internal {
         /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
         /// <param name="stream">The <see cref="Stream"/> to read the <see langword="string"/> from.</param>
         public static void PushString(Stack stack, Stream stream) {
-            var str = stream.ReadLine(false);
+            var str = stream.ReadLine();
             if (str.Length < 2 || str[0] != str.Last() || str[0] != '\'')
                 throw new UnpicklingException("The STRING op-code argument must be quoted");
             stack.Push(str);
@@ -229,7 +229,7 @@ namespace sharppickle.Internal {
         /// <param name="stream">The stream to read the index from.</param>
         /// <param name="memo">The memory to retrieve the value from.</param>
         public static void Get(Stack stack, Stream stream, IDictionary<int, object> memo) {
-            var index = int.Parse(stream.ReadLine(false));
+            var index = int.Parse(stream.ReadLine());
             stack.Push(memo[index]);
         }
 
@@ -262,7 +262,7 @@ namespace sharppickle.Internal {
         /// <param name="stream">The stream to read the index from.</param>
         /// <param name="memo">The memory to retrieve the value from.</param>
         public static void Put(Stack stack, Stream stream, IDictionary<int, object> memo) {
-            var i = int.Parse(stream.ReadLine(false));
+            var i = int.Parse(stream.ReadLine());
             if (i < 0)
                 throw new UnpicklingException("Negative PUT argument.");
             memo[i] = stack.Peek();

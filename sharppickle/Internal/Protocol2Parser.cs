@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using sharppickle.Exceptions;
-using sharppickle.Utilities;
+using sharppickle.Extensions;
 
 namespace sharppickle.Internal {
     /// <summary>
@@ -73,8 +73,7 @@ namespace sharppickle.Internal {
         /// <param name="reader">The reader to read the length of the long value from.</param>
         public static void ReadLong1(Stack stack, BinaryReader reader) {
             var n = reader.ReadByte();
-            var data = Encoding.UTF8.GetString(reader.ReadBytes(n));
-            stack.Push(long.Parse(data, NumberStyles.Any, CultureInfo.InvariantCulture));
+            stack.Push(reader.ReadLittleEndianNumber(n));
         }
 
         /// <summary>
@@ -83,7 +82,8 @@ namespace sharppickle.Internal {
         /// <param name="stack">The stack to perform the operation on.</param>
         /// <param name="reader">The reader to read the length of the long value from.</param>
         public static void ReadLong4(Stack stack, BinaryReader reader) {
-            var n = reader.ReadLittleEndianInt32();
+            var bytes = reader.ReadBytes(4);
+            var n = BitConverter.ToInt32(bytes, 0);
             if(n < 0)
                 throw new UnpicklingException("LONG pickle has negative byte count");
             var data = Encoding.UTF8.GetString(reader.ReadBytes(n));

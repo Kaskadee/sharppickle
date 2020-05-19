@@ -5,8 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using sharppickle.Exceptions;
+using sharppickle.Extensions;
 using sharppickle.Internal;
-using sharppickle.Utilities;
 
 namespace sharppickle {
     /// <summary>
@@ -157,8 +157,8 @@ namespace sharppickle {
                         inst.SetState(state);
                         break;
                     case PickleOpCodes.Global:
-                        var module = _stream.ReadLine(false);
-                        var name = _stream.ReadLine(false);
+                        var module = _stream.ReadLine();
+                        var name = _stream.ReadLine();
                         if(!_pythonProxyMappings.ContainsKey(module) || !_pythonProxyMappings[module].ContainsKey(name))
                             throw new UnpicklingException($"No proxy object for the type {module}.{name} has been found!");
                         stack.Push(_pythonProxyMappings[module][name]);
@@ -174,8 +174,8 @@ namespace sharppickle {
                         stack.Push(Instantiate(newT, newObjArg));
                         break;
                     case PickleOpCodes.Inst:
-                        var moduleInst = _stream.ReadLine(false);
-                        var nameInst = _stream.ReadLine(false);
+                        var moduleInst = _stream.ReadLine();
+                        var nameInst = _stream.ReadLine();
                         if (!_pythonProxyMappings.ContainsKey(moduleInst) || !_pythonProxyMappings[moduleInst].ContainsKey(nameInst))
                             throw new UnpicklingException($"No proxy object for the type {moduleInst}.{nameInst} has been found!");
                         var proxyType = _pythonProxyMappings[moduleInst][nameInst];
