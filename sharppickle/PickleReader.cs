@@ -147,12 +147,16 @@ namespace sharppickle {
                 if (UnsupportedOpCodes.Contains(opCode))
                     throw new NotSupportedException($"Unsupported op-code '{opCode}' has been read!");
                 // Invoke op-code mappings.
-                if(OpCodeMappings.ContainsKey(opCode))
+                if (OpCodeMappings.ContainsKey(opCode)) {
                     OpCodeMappings[opCode]?.Invoke(stack, br, memo);
-                if(opCode == PickleOpCodes.BinString)
+                    continue;
+                } else if (opCode == PickleOpCodes.BinString) {
                     Protocol1Parser.PushBinaryString(stack, br, Encoding);
-                if(opCode == PickleOpCodes.ShortBinString)
+                    continue;
+                } else if (opCode == PickleOpCodes.ShortBinString) {
                     Protocol1Parser.PushBinaryString(stack, br, Encoding);
+                    continue;
+                }
                 // Handle special op-codes.
                 switch (opCode) {
                     case PickleOpCodes.Build:
