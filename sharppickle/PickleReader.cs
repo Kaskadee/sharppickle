@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -208,16 +208,22 @@ namespace sharppickle {
             _pythonProxyMappings[moduleName][name] = typeof(T);
         }
 
+        /// <summary>
+        ///     Creates an instance of the specified type with the specified arguments.
+        /// </summary>
+        /// <param name="type">The type of the derived <seealso cref="PythonObject"/>.</param>
+        /// <param name="args">The arguments to pass.</param>
+        /// <returns>The instantiated <see cref="PythonObject"/>.</returns>
         private PythonObject Instantiate(Type type, params object[] args) {
-            if(type == null)
+            if (type == null)
                 throw new ArgumentNullException(nameof(type));
-            if(!type.IsSubclassOf(typeof(PythonObject)))
+            if (!type.IsSubclassOf(typeof(PythonObject)))
                 throw new ArgumentException($"The specified type must be a subclass of {typeof(PythonObject)}");
-            if (args == null || (args is { } argsArray && argsArray.Length == 0)) 
-                return (PythonObject) Activator.CreateInstance(type);
-            if(args[0] is object[] arr && arr.Length == 0)
+            if (args == null || (args is { } argsArray && argsArray.Length == 0))
                 return (PythonObject)Activator.CreateInstance(type);
-            return (PythonObject) Activator.CreateInstance(type, args);
+            if (args[0] is object[] arr && arr.Length == 0)
+                return (PythonObject)Activator.CreateInstance(type);
+            return (PythonObject)Activator.CreateInstance(type, args);
         }
 
         /// <summary>
