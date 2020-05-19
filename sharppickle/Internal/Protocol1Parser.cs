@@ -123,7 +123,7 @@ namespace sharppickle.Internal {
         /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
         /// <param name="reader">The <see cref="BinaryReader"/> to read the <see langword="int"/> from.</param>
         public static void PushBinaryInt32(Stack stack, BinaryReader reader) {
-            stack.Push(reader.ReadInt32());
+            stack.Push(reader.ReadLittleEndianInt32());
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace sharppickle.Internal {
         public static void PushBinaryUInt16(Stack stack, Stream stream) {
             var buffer = new byte[sizeof(ushort)];
             stream.Read(buffer, 0, buffer.Length);
-            stack.Push((uint)BitConverter.ToUInt16(buffer, 0));
+            stack.Push(BitConverter.ToUInt16(buffer, 0));
         }
 
         /// <summary>
