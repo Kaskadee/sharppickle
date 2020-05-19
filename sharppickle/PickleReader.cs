@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using JetBrains.Annotations;
 using sharppickle.Exceptions;
 using sharppickle.Extensions;
 using sharppickle.Internal;
@@ -198,6 +199,7 @@ namespace sharppickle {
         /// <typeparam name="T">The type of the python object to register.</typeparam>
         /// <param name="moduleName">The name of the module under which to register the object.</param>
         /// <param name="name">The name mapping of the object.</param>
+        [PublicAPI]
         public void RegisterObject<T>(string moduleName, string name) where T : PythonObject, new() {
             if(_pythonProxyMappings.ContainsKey(moduleName) && _pythonProxyMappings[moduleName].ContainsKey(name))
                 throw new ArgumentException("A proxy object with the specified name already exists.", nameof(name));
