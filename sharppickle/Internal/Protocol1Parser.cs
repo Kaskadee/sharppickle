@@ -20,17 +20,13 @@ namespace sharppickle.Internal {
         ///     Appends a special <see cref="Mark"/> object to the top of the stack.
         /// </summary>
         /// <param name="stack">The stack to push the mark object to.</param>
-        public static void SetMark(Stack stack) {
-            stack.Push(new Mark());
-        }
+        public static void SetMark(Stack stack) => stack.Push(new Mark());
 
         /// <summary>
         ///     Discards the top most item on the specified stack.
         /// </summary>
         /// <param name="stack">The stack to discard the top most item from.</param>
-        public static void Pop(Stack stack) {
-            stack.Pop();
-        }
+        public static void Pop(Stack stack) => stack.Pop();
 
         /// <summary>
         ///     Discards the stack through the top most <see cref="Mark"/> object.
@@ -55,9 +51,7 @@ namespace sharppickle.Internal {
         ///     Duplicates the top most item on the stack.
         /// </summary>
         /// <param name="stack">The stack to perform the operation on.</param>
-        public static void Duplicate(Stack stack) {
-            stack.Push(stack.Peek());
-        }
+        public static void Duplicate(Stack stack) => stack.Push(stack.Peek());
 
         #endregion
 
@@ -120,18 +114,14 @@ namespace sharppickle.Internal {
         /// </summary>
         /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
         /// <param name="reader">The <see cref="BinaryReader"/> to read the <see langword="int"/> from.</param>
-        public static void PushBinaryInt32(Stack stack, BinaryReader reader) {
-            stack.Push(reader.ReadLittleEndianInt32());
-        }
+        public static void PushBinaryInt32(Stack stack, BinaryReader reader) => stack.Push(reader.ReadLittleEndianInt32());
 
         /// <summary>
         ///     Pushes a <see langword="uint"/> with the length of one byte.
         /// </summary>
         /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
         /// <param name="stream">The <see cref="Stream"/> to read the <see langword="uint"/> from.</param>
-        public static void PushBinaryUInt8(Stack stack, Stream stream) {
-            stack.Push(stream.ReadByte());
-        }
+        public static void PushBinaryUInt8(Stack stack, Stream stream) => stack.Push(stream.ReadByte());
 
         /// <summary>
         ///     Pushes a <see langword="uint"/> with the length of two bytes.
@@ -195,9 +185,7 @@ namespace sharppickle.Internal {
         /// </summary>
         /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
         /// <param name="reader">The <see cref="BinaryReader"/> to read the <see langword="string"/> from.</param>
-        public static void PushUnicode(Stack stack, BinaryReader reader) {
-            stack.Push(reader.ReadUnicodeString());
-        }
+        public static void PushUnicode(Stack stack, BinaryReader reader) => stack.Push(reader.ReadUnicodeString());
 
         /// <summary>
         ///     Pushes a length-prefixed (1 byte) unicode-escaped <see langword="string"/> on to the top of the stack.
@@ -213,9 +201,7 @@ namespace sharppickle.Internal {
         ///     Pushes <see langword="null"/> to the top of the stack.
         /// </summary>
         /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
-        public static void PushNone(Stack stack) {
-            stack.Push(null);
-        }
+        public static void PushNone(Stack stack) => stack.Push(null);
 
         #endregion
 
@@ -312,25 +298,19 @@ namespace sharppickle.Internal {
         ///     Pushes an empty <see cref="IDictionary"/> to the top of the stack.
         /// </summary>
         /// <param name="stack">The stack to perform the operation on.</param>
-        public static void CreateEmptyDictionary(Stack stack) {
-            stack.Push(new Dictionary<object, object>());
-        }
+        public static void CreateEmptyDictionary(Stack stack) => stack.Push(new Dictionary<object, object>());
 
         /// <summary>
         ///     Pushes an <see cref="IList"/> with the top most items to the stack.
         /// </summary>
         /// <param name="stack">The stack to perform the operation on.</param>
-        public static void CreateList(Stack stack) {
-            stack.Push(PopMark(stack));
-        }
+        public static void CreateList(Stack stack) => stack.Push(PopMark(stack));
 
         /// <summary>
         ///     Pushes an empty <see cref="IList"/> to the top of the stack.
         /// </summary>
         /// <param name="stack">The stack to perform the operation on.</param>
-        public static void CreateEmptyList(Stack stack) {
-            stack.Push(new ArrayList());
-        }
+        public static void CreateEmptyList(Stack stack) => stack.Push(new ArrayList());
 
         /// <summary>
         ///     Pushes an <see cref="Array"/> wih the top most items to the stack.
@@ -347,9 +327,7 @@ namespace sharppickle.Internal {
         ///     Pushes an empty <see cref="Array"/> to the stack.
         /// </summary>
         /// <param name="stack">The stack to perform the operation on.</param>
-        public static void CreateEmptyTuple(Stack stack) {
-            stack.Push(new object[] { });
-        }
+        public static void CreateEmptyTuple(Stack stack) => stack.Push(new object[] { });
 
         #endregion
 
