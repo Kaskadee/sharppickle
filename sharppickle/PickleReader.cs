@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -11,13 +11,13 @@ using sharppickle.Internal;
 
 namespace sharppickle {
     /// <summary>
-    ///     Provides a fully managed deserializer for data serialized using Python's Pickle Format.
+    ///     Provides a managed deserializer for data serialized using Python's Pickle format.
     /// </summary>
     public sealed class PickleReader : IDisposable {
         /// <summary>
-        ///     The highest protocol number we know how to read.
+        ///     The highest protocol version that can be read by <see cref="PickleReader"/>.
         /// </summary>
-        public const int HighestProtocol = 3;
+        public const int MaximumProtocolVersion = 3;
 
         /// <summary>
         ///     Gets the array of unsupported pickle op-codes, which can't be implemented because of python-specific implementations.
@@ -122,36 +122,40 @@ namespace sharppickle {
         }
 
         /// <summary>
-        ///     Unpickles the previous specified data and returns the deserialized data objects.
+        ///     Deserializes the previous specified data and returns the deserialized data objects.
         /// </summary>
         /// <returns>The deserialized objects as an array of objects.</returns>
         public object[] Unpickle() {
-            // Check if pickle is supported.
+            // Check if pickle version is supported.
             var version = _stream.ReadByte() != (byte) PickleOpCodes.Proto ? 1 : Protocol2Parser.GetProtocolVersion(_stream);
-            if(version > HighestProtocol)
+            if(version > MaximumProtocolVersion)
                 throw new NotSupportedException($"The specified pickle is currently not supported. (version: {version})");
+            // Open stream in binary reader.
             using var br = new BinaryReader(_stream, Encoding.UTF8);
-
             var stack = new Stack();
             var memo = new Dictionary<int, object>();
-
-            while (_stream.Position < _stream.Length) {
+            // Read file until either STOP signal has been found or stream has reached EOF.
+            while (_stream.Position != _stream.Length) {
+                // Parse op-code.
                 var opByte = br.ReadByte();
                 if (!Enum.IsDefined(typeof(PickleOpCodes), opByte))
-                    throw new InvalidDataException($"Unknown op-code has been found: 0x{opByte:X}");
+                    throw new InvalidDataException($"Unknown op-code has been read: 0x{opByte:X}");
                 var opCode = (PickleOpCodes)opByte;
+                // Check if STOP signal has been reached.
                 if (opCode == PickleOpCodes.Stop)
                     return stack.ToArray();
+                // Check if op-code is officially unsupported.
                 if (UnsupportedOpCodes.Contains(opCode))
-                    throw new NotSupportedException($"Unsupported op-code '{opCode}' has been found!");
-                // Handle special cases.
+                    throw new NotSupportedException($"Unsupported op-code '{opCode}' has been read!");
+                // Invoke op-code mappings.
+                if(OpCodeMappings.ContainsKey(opCode))
+                    OpCodeMappings[opCode]?.Invoke(stack, br, memo);
+                if(opCode == PickleOpCodes.BinString)
+                    Protocol1Parser.PushBinaryString(stack, br, Encoding);
+                if(opCode == PickleOpCodes.ShortBinString)
+                    Protocol1Parser.PushBinaryString(stack, br, Encoding);
+                // Handle special op-codes.
                 switch (opCode) {
-                    case PickleOpCodes.BinString:
-                        Protocol1Parser.PushBinaryString(stack, br, Encoding);
-                        break;
-                    case PickleOpCodes.ShortBinString:
-                        Protocol1Parser.PushShortBinaryString(stack, br, Encoding);
-                        break;
                     case PickleOpCodes.Build:
                         var state = stack.Pop();
                         var inst = (PythonObject) stack.Peek();
@@ -183,14 +187,11 @@ namespace sharppickle {
                         stack.Push(Instantiate(proxyType, Protocol1Parser.PopMark(stack).Cast<object>().ToArray()));
                         break;
                     default:
-                        if (!OpCodeMappings.ContainsKey(opCode))
-                            throw new UnpicklingException($"No op-code mapping for op-code '{opCode}' found!");
-                        OpCodeMappings[opCode]?.Invoke(stack, br, memo);
-                        break;
+                        throw new UnpicklingException($"No mapping for op-code '{opCode}' available!");
                 }
             }
 
-            throw new UnpicklingException("No STOP code has been received.");
+            throw new UnpicklingException("EOF reached without STOP signal.");
         }
 
         /// <summary>
