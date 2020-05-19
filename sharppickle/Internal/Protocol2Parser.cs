@@ -53,17 +53,13 @@ namespace sharppickle.Internal {
         ///     Pushes <see langword="true"/> on to the stack.
         /// </summary>
         /// <param name="stack">The stack to perform the operation on.</param>
-        public static void PushTrue(Stack stack) {
-            stack.Push(true);
-        }
+        public static void PushTrue(Stack stack) => stack.Push(true);
 
         /// <summary>
         ///     Pushes <see langword="false"/> on to the stack.
         /// </summary>
         /// <param name="stack">The stack to perform the operation on.</param>
-        public static void PushFalse(Stack stack) {
-            stack.Push(false);
-        }
+        public static void PushFalse(Stack stack) => stack.Push(false);
 
         /// <summary>
         ///     Pushes a long on to the stack.

@@ -1,6 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <!-- Product Information -->
+    <Product>sharppickle</Product>
+    <Company>Fabian Creutz</Company>
+    <Copyright>Copyright © 2018-2020 Fabian Creutz</Copyright>
+    <!-- Assembly Version -->
+    <Version>1.1.0</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <FileVersion>$(FileVersion)</FileVersion>
+    <!-- Compiler Properties -->
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
@@ -8,5 +16,4 @@
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" />
   </ItemGroup>
-
 </Project>
