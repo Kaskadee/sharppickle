@@ -77,11 +77,10 @@ namespace sharppickle {
             [PickleOpCodes.BinaryBytes] = (stack, reader, memo) => Protocol3Parser.PushBytes(stack, reader.BaseStream),
             [PickleOpCodes.ShortBinaryBytes] = (stack, reader, memo) => Protocol3Parser.PushShortBytes(stack, reader.BaseStream),
         };
+        private readonly IDictionary<string, IDictionary<string, Type>> _pythonProxyMappings = new Dictionary<string, IDictionary<string, Type>>();
 
         private readonly Stream _stream;
         private readonly bool _leaveOpen;
-
-        private readonly IDictionary<string, IDictionary<string, Type>> _pythonProxyMappings = new Dictionary<string, IDictionary<string, Type>>();
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="PickleReader"/> class using the specified file.
