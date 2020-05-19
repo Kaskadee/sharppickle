@@ -1,4 +1,7 @@
-﻿namespace sharppickle {
+﻿using System;
+using JetBrains.Annotations;
+
+namespace sharppickle {
     /// <summary>
     ///     Provides a template to implement a Python object, which can be deserialized using <see cref="PickleReader"/>.
     /// </summary>
@@ -6,13 +9,17 @@
         /// <summary>
         ///     Initializes a new instance of the <see cref="PythonObject"/> class.
         /// </summary>
-        protected PythonObject() { }
+        [PublicAPI]
+        protected PythonObject() : this(new object[0]) { }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="PythonObject"/> class.
         /// </summary>
         /// <param name="args">The arguments to create the object with.</param>
-        protected PythonObject(params object[] args) { }
+        protected PythonObject(params object[] args) {
+            if(args == null)
+                throw new ArgumentNullException(nameof(args));
+        }
 
         /// <summary>
         ///     Sets the state of the object.
