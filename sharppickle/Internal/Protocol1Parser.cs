@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using sharppickle.Exceptions;
-using sharppickle.Utilities;
+using sharppickle.Extensions;
 
 namespace sharppickle.Internal {
     /// <summary>
@@ -39,18 +39,16 @@ namespace sharppickle.Internal {
         /// <returns>An list with the discarded items.</returns>
         public static IList PopMark(Stack stack) {
             var list = new ArrayList();
-            try {
-                while (true) {
-                    if (stack.Count == 0)
-                        return list;
-                    var obj = stack.Pop();
-                    if (obj is Mark)
-                        return list;
-                    list.Add(obj);
+            while (stack.Count > 0) {
+                if (stack.Peek() is Mark) {
+                    stack.Pop();
+                    break;
                 }
-            } finally {
-                list.Reverse();
+                list.Add(stack.Pop());
             }
+
+            list.Reverse();
+            return list;
         }
 
         /// <summary>
