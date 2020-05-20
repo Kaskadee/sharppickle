@@ -25,3 +25,8 @@ using(var reader = new PickleReader(new FileInfo("data.pickle")) {
 ---
 
 Please visit the [rpaextract](https://git.kaskadee.eu/Kaskadee/rpaextract ) repository for an example application using `sharppickle`. Usage can be found in [Archive.cs](https://git.kaskadee.eu/Kaskadee/rpaextract/src/branch/master/csharp/rpaextract/Archive.cs#L138 ).
+
+### License
+---
+
+sharppickle is licensed under the [European Union Public Licence v1.2](https://git.kaskadee.eu/Kaskadee/sharppickle/src/branch/master/LICENSE )
