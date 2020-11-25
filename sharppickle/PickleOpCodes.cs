@@ -236,23 +236,62 @@
 
         #region Protocol 4.x
 
+        /// <summary>
+        ///     Push short UTF-8 string with length less than 256 bytes.
+        /// </summary>
         ShortBinaryUnicode = (byte)'\x8c',
+        /// <summary>
+        ///     Push very long string.
+        /// </summary>
         BinaryUnicode8 = (byte)'\x8d',
+        /// <summary>
+        ///     Push very long bytes string.
+        /// </summary>
         BinaryBytes8 = (byte)'\x8e',
+        /// <summary>
+        ///     Push empty set on the stack.
+        /// </summary>
         EmptySet = (byte)'\x8f',
+        /// <summary>
+        ///     Modify set by adding topmost stack items.
+        /// </summary>
         AddItems = (byte)'\x90',
+        /// <summary>
+        ///     Build frozen set from topmost stack items.
+        /// </summary>
         FrozenSet = (byte)'\x91',
+        /// <summary>
+        ///     Like <see cref="NewObj"/> but work with keyword only arguments.
+        /// </summary>
         NewObjEx = (byte)'\x92',
+        /// <summary>
+        ///     Same as <see cref="Global"/> but using names on the stack.
+        /// </summary>
         StackGlobal = (byte)'\x93',
+        /// <summary>
+        ///     Store top of the stack in memo.
+        /// </summary>
         Memoize = (byte)'\x94',
+        /// <summary>
+        ///     Indicate the beginning of a new frame.
+        /// </summary>
         Frame = (byte) '\x95',
 
         #endregion
 
         #region Protocol 5.x
 
+        /// <summary>
+        ///     Push byte array.
+        /// </summary>
         ByteArray8 = (byte)'\x96',
+        /// <summary>
+        ///     Push next out-of-band buffer.
+        /// </summary>
         NextBuffer = (byte)'\x97',
+        /// <summary>
+        ///     Make top stack readonly.
+        /// </summary>
         ReadonlyBuffer = (byte)'\x98'
 
         #endregion
