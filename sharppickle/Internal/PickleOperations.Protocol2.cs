@@ -12,13 +12,6 @@ namespace sharppickle.Internal {
     /// </summary>
     internal static partial class PickleOperations {
         /// <summary>
-        ///     Identifies the pickle protocol and returns the protocol version.
-        /// </summary>
-        /// <param name="stream">The stream to read the pickle data from.</param>
-        /// <returns>The retrieve protocol version of the currently loaded pickle.</returns>
-        public static int GetProtocolVersion(Stream stream) => stream.ReadByte();
-
-        /// <summary>
         ///     Creates a single tuple from the top most item on the stack.
         /// </summary>
         /// <param name="stack">The stack to perform the operation on.</param>
