@@ -16,9 +16,11 @@ namespace sharppickle.Extensions {
         /// <exception cref="UnpicklingException">The element is of type {type} but {T} was expected.</exception>
         public static T Peek<T>(this Stack stack) {
             var obj = stack.Peek();
-            if(!(obj is T value))
-                throw new UnpicklingException($"The element is of type {obj.GetType().Name} but {typeof(T).Name} was expected.");
-            return value;
+            return obj switch {
+                null => throw new UnpicklingException("The element is null."),
+                T value => value,
+                _ => throw new UnpicklingException($"The element is of type {obj.GetType().Name} but {typeof(T).Name} was expected.")
+            };
         }
     }
 }

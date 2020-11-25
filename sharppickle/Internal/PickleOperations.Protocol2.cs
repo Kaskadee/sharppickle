@@ -10,7 +10,7 @@ namespace sharppickle.Internal {
     /// <summary>
     ///     Provides the implementation of all op-codes defined in protocol version 2.x.
     /// </summary>
-    internal static class Protocol2Parser {
+    internal static partial class PickleOperations {
         /// <summary>
         ///     Identifies the pickle protocol and returns the protocol version.
         /// </summary>
