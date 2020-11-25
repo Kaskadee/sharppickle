@@ -126,7 +126,7 @@ namespace sharppickle {
         /// <returns>The deserialized objects as an array of objects.</returns>
         public object[] Unpickle() {
             // Check if pickle version is supported.
-            var version = _stream.ReadByte() != (byte) PickleOpCodes.Proto ? 1 : Protocol2Parser.GetProtocolVersion(_stream);
+            var version = _stream.ReadByte() != (byte) PickleOpCodes.Proto ? 1 : PickleOperations.GetProtocolVersion(_stream);
             if(version > MaximumProtocolVersion)
                 throw new NotSupportedException($"The specified pickle is currently not supported. (version: {version})");
             // Open stream in binary reader.
@@ -151,10 +151,10 @@ namespace sharppickle {
                     OpCodeMappings[opCode]?.Invoke(stack, br, memo);
                     continue;
                 } else if (opCode == PickleOpCodes.BinString) {
-                    Protocol1Parser.PushBinaryString(stack, br, Encoding);
+                    PickleOperations.PushBinaryString(stack, br, Encoding);
                     continue;
                 } else if (opCode == PickleOpCodes.ShortBinString) {
-                    Protocol1Parser.PushShortBinaryString(stack, br, Encoding);
+                    PickleOperations.PushShortBinaryString(stack, br, Encoding);
                     continue;
                 }
                 // Handle special op-codes.
@@ -172,7 +172,7 @@ namespace sharppickle {
                         stack.Push(_pythonProxyMappings[module][name]);
                         break;
                     case PickleOpCodes.Obj:
-                        var args = Protocol1Parser.PopMark(stack).Cast<object>().ToArray();
+                        var args = PickleOperations.PopMark(stack).Cast<object>().ToArray();
                         var t = (Type) args[0];
                         stack.Push(Instantiate(t, args.Skip(1).ToArray()));
                         break;
@@ -187,7 +187,7 @@ namespace sharppickle {
                         if (!_pythonProxyMappings.ContainsKey(moduleInst) || !_pythonProxyMappings[moduleInst].ContainsKey(nameInst))
                             throw new UnpicklingException($"No proxy object for the type {moduleInst}.{nameInst} has been found!");
                         var proxyType = _pythonProxyMappings[moduleInst][nameInst];
-                        stack.Push(Instantiate(proxyType, Protocol1Parser.PopMark(stack).Cast<object>().ToArray()));
+                        stack.Push(Instantiate(proxyType, PickleOperations.PopMark(stack).Cast<object>().ToArray()));
                         break;
                     default:
                         throw new UnpicklingException($"No mapping for op-code '{opCode}' available!");
