@@ -233,5 +233,28 @@
         ShortBinaryBytes = (byte)'C',
 
         #endregion
+
+        #region Protocol 4.x
+
+        ShortBinaryUnicode = (byte)'\x8c',
+        BinaryUnicode8 = (byte)'\x8d',
+        BinaryBytes8 = (byte)'\x8e',
+        EmptySet = (byte)'\x8f',
+        AddItems = (byte)'\x90',
+        FrozenSet = (byte)'\x91',
+        NewObjEx = (byte)'\x92',
+        StackGlobal = (byte)'\x93',
+        Memoize = (byte)'\x94',
+        Frame = (byte) '\x95',
+
+        #endregion
+
+        #region Protocol 5.x
+
+        ByteArray8 = (byte)'\x96',
+        NextBuffer = (byte)'\x97',
+        ReadonlyBuffer = (byte)'\x98'
+
+        #endregion
     }
 }
