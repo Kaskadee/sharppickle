@@ -8,8 +8,7 @@ using sharppickle.Extensions;
 
 namespace sharppickle.Internal {
     /// <summary>
-    ///     Provides a class which is able to handle pickle protocol 2.x op-codes.
-    ///     Protocol 2 includes PROTO, NEWOBJ, EXT1, EXT2, EXT4, TUPLE1, TUPLE2, TUPLE3, NEWTRUE, NEWFALSE, LONG1, LONG4.
+    ///     Provides the implementation of all op-codes defined in protocol version 2.x.
     /// </summary>
     internal static class Protocol2Parser {
         /// <summary>

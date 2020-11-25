@@ -10,10 +10,9 @@ using sharppickle.Extensions;
 
 namespace sharppickle.Internal {
     /// <summary>
-    ///     Provides a class which is able to handle pickle protocol 1.x op-codes.
-    ///     Protocol 1 includes all base op-codes e.g. MARK, STOP, POP, POP_MARK, DUP and so on...
+    ///     Provides the implementation of all op-codes defined in protocol version 1.x.
     /// </summary>
-    internal static class Protocol1Parser {
+    internal static partial class PickleOperations {
         #region General
 
         /// <summary>

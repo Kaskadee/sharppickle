@@ -3,10 +3,9 @@ using System.IO;
 
 namespace sharppickle.Internal {
     /// <summary>
-    ///     Provides a class which is able to handle pickle protocol 3.x op-codes.
-    ///     Protocol 3 includes two new op-codes: BINBYTES and SHORT_BINBYTES.
+    ///     Provides the implementation of all op-codes defined in protocol version 3.x.
     /// </summary>
-    internal static class Protocol3Parser {
+    internal static partial class PickleOperations {
         /// <summary>
         ///     Reads the length of the data, then reads the amount of bytes from the stream and pushes the byte array to the top of the stack.
         /// </summary>
