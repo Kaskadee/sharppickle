@@ -102,7 +102,7 @@ namespace sharppickle {
                         arguments[i] = br;
                     } else if (type == typeof(Stream)) {
                         arguments[i] = br.BaseStream;
-                    } else if (type == typeof(Dictionary<int, object?>)) {
+                    } else if (type == typeof(Dictionary<int, object?>) || type == typeof(IDictionary<int, object?>)) {
                         arguments[i] = memo;
                     } else if (type == typeof(Encoding)) {
                         arguments[i] = Encoding;
