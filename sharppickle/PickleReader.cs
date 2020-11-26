@@ -70,6 +70,7 @@ namespace sharppickle {
         ///     Deserializes the previous specified data and returns the deserialized data objects.
         /// </summary>
         /// <returns>The deserialized objects as an array of objects.</returns>
+        [PublicAPI]
         public object?[] Unpickle() {
             // Check if pickle version is supported.
             var version = _stream.ReadByte() != (byte) PickleOpCodes.Proto ? 1 : PickleOperations.GetProtocolVersion(_stream);
