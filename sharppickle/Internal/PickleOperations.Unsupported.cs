@@ -29,6 +29,12 @@ namespace sharppickle.Internal {
         [PickleMethod(PickleOpCodes.Frame)]
         public static void FrameStub() => ThrowUnsupportedException();
 
+        [PickleMethod(PickleOpCodes.NextBuffer)]
+        public static void NextBufferStub() => ThrowUnsupportedException();
+
+        [PickleMethod(PickleOpCodes.ReadonlyBuffer)]
+        public static void ReadonlyBufferStub() => ThrowUnsupportedException();
+
         /// <summary>
         ///     Throws an instance of the <see cref="UnpicklingException"/> to indicate that an unsupported op-code has been found.
         /// </summary>

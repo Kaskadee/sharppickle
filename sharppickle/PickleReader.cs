@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using sharppickle.Attributes;
 using sharppickle.Exceptions;
-using sharppickle.Extensions;
 using sharppickle.Internal;
 
 namespace sharppickle {
@@ -20,7 +19,7 @@ namespace sharppickle {
         /// <summary>
         ///     The highest protocol version that can be read by <see cref="PickleReader"/>.
         /// </summary>
-        public const int MaximumProtocolVersion = 4;
+        public const int MaximumProtocolVersion = 5;
 
         /// <summary>
         ///     Gets or sets the encoding used to encode strings read by <see cref="PickleOpCodes.String"/>, <see cref="PickleOpCodes.BinString"/> or <see cref="PickleOpCodes.ShortBinString"/>.
@@ -32,32 +31,39 @@ namespace sharppickle {
         private readonly IDictionary<string, IDictionary<string, Type>> _pythonProxyMappings = new Dictionary<string, IDictionary<string, Type>>();
 
         private readonly Stream _stream;
+        private readonly Stream? _outOfBandStream;
         private readonly bool _leaveOpen;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="PickleReader"/> class using the specified serialized data.
         /// </summary>
         /// <param name="data">The serialized data as a byte array.</param>
-        public PickleReader(byte[] data) : this(new MemoryStream(data)) { }
+        /// <param name="outOfBandStream">The stream to read out-of-band data from (can be null).</param>
+        public PickleReader(byte[] data, Stream? outOfBandStream = null) : this(new MemoryStream(data), outOfBandStream: outOfBandStream) { }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="PickleReader"/> class using the specified file.
         /// </summary>
         /// <param name="file">The <see cref="FileInfo"/> for the file to load and read the serialized data from.</param>
-        public PickleReader(FileInfo file) : this(file.Open(FileMode.Open, FileAccess.Read, FileShare.Read)) { }
+        /// <param name="outOfBandStream">The stream to read out-of-band data from (can be null).</param>
+        public PickleReader(FileInfo file, Stream? outOfBandStream = null) : this(file.Open(FileMode.Open, FileAccess.Read, FileShare.Read), outOfBandStream: outOfBandStream) { }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="PickleReader"/> class using the specified <seealso cref="Stream"/>.
         /// </summary>
         /// <param name="stream">The <seealso cref="Stream"/> to read the serialized data from.</param>
         /// <param name="leaveOpen">Whether to keep the underlying stream open, after the <see cref="PickleReader"/> instance is disposed.</param>
-        public PickleReader(Stream stream, bool leaveOpen = false) {
+        /// <param name="outOfBandStream">The stream to read out-of-band data from (can be null).</param>
+        public PickleReader(Stream stream, bool leaveOpen = false, Stream? outOfBandStream = null) {
             if(stream == null)
                 throw new ArgumentNullException(nameof(stream));
             if(!stream.CanRead || !stream.CanSeek)
                 throw new NotSupportedException("The specified stream must be readable and seekable!");
+            if(_outOfBandStream?.CanRead == false)
+                throw new NotSupportedException("The out-of-band stream must be readable!");
             _stream = stream;
             _leaveOpen = leaveOpen;
+            _outOfBandStream = outOfBandStream;
         }
 
         /// <summary>
@@ -141,6 +147,12 @@ namespace sharppickle {
         }
 
         /// <summary>
+        ///     Gets the out-of-band stream if defined.
+        /// </summary>
+        /// <returns>The out-of-band stream or <c>null</c> if not applicable.</returns>
+        internal Stream? GetOutOfBandStream() => _outOfBandStream;
+
+            /// <summary>
         ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose() {
