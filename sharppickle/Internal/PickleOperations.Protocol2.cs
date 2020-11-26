@@ -19,7 +19,7 @@ namespace sharppickle.Internal {
         [PickleMethod(PickleOpCodes.Tuple1)]
         public static void CreateTuple1(Stack stack) {
             var item1 = stack.Pop();
-            stack.Push(new Tuple<object>(item1));
+            stack.Push(new Tuple<object?>(item1));
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace sharppickle.Internal {
         public static void CreateTuple2(Stack stack) {
             var item1 = stack.Pop();
             var item2 = stack.Pop();
-            stack.Push(new Tuple<object, object>(item2, item1));
+            stack.Push(new Tuple<object?, object?>(item2, item1));
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace sharppickle.Internal {
             var item1 = stack.Pop();
             var item2 = stack.Pop();
             var item3 = stack.Pop();
-            stack.Push(new Tuple<object, object, object>(item3, item2, item1));
+            stack.Push(new Tuple<object?, object?, object?>(item3, item2, item1));
         }
 
         /// <summary>
