@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.IO;
+using sharppickle.Attributes;
 
 namespace sharppickle.Internal {
     /// <summary>
@@ -11,6 +12,7 @@ namespace sharppickle.Internal {
         /// </summary>
         /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
         /// <param name="stream">The <see cref="Stream"/> to read the data from.</param>
+        [PickleMethod(PickleOpCodes.BinaryBytes)]
         public static void PushBytes(Stack stack, Stream stream) {
             // Read little-endian unsigned 32-bit integer.
             var buffer = new byte[sizeof(uint)];
@@ -29,6 +31,7 @@ namespace sharppickle.Internal {
         /// </summary>
         /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
         /// <param name="stream">The <see cref="Stream"/> to read the data from.</param>
+        [PickleMethod(PickleOpCodes.ShortBinaryBytes)]
         public static void PushShortBytes(Stack stack, Stream stream) {
             // Read byte as length prefix.
             var length = stream.ReadByte();

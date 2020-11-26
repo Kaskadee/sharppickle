@@ -25,6 +25,6 @@ namespace sharppickle {
         ///     Sets the state of the object.
         /// </summary>
         /// <param name="obj">The object state to apply.</param>
-        public abstract void SetState(object obj);
+        public abstract void SetState(object? obj);
     }
 }
