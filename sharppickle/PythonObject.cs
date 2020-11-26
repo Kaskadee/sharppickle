@@ -10,13 +10,13 @@ namespace sharppickle {
         ///     Initializes a new instance of the <see cref="PythonObject"/> class.
         /// </summary>
         [PublicAPI]
-        protected PythonObject() : this(new object[0]) { }
+        protected PythonObject() : this(Array.Empty<object?>()) { }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="PythonObject"/> class.
         /// </summary>
         /// <param name="args">The arguments to create the object with.</param>
-        protected PythonObject(params object[] args) {
+        protected PythonObject(params object?[] args) {
             if(args == null)
                 throw new ArgumentNullException(nameof(args));
         }
