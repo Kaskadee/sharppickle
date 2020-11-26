@@ -19,13 +19,8 @@ namespace sharppickle.Internal {
         public static int GetProtocolVersion(Stream stream) {
             if (!stream.CanSeek)
                 throw new NotSupportedException("The stream must be seekable!");
-            var oldPos = stream.Position;
-            try {
-                stream.Seek(0, SeekOrigin.Begin);
-                return stream.ReadByte();
-            } finally {
-                stream.Seek(oldPos, SeekOrigin.Begin);
-            }
+            stream.Seek(1, SeekOrigin.Begin); 
+            return stream.ReadByte();
         }
     }
 }
