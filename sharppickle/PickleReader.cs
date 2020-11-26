@@ -90,7 +90,7 @@ namespace sharppickle {
                 if (opCode == PickleOpCodes.Stop)
                     return stack.ToArray();
                 // Find op-code implementation using reflection and the custom pickle method attribute.
-                var method = typeof(PickleOperations).GetMethods(BindingFlags.Static | BindingFlags.NonPublic).FirstOrDefault(x => x.GetCustomAttribute<PickleMethodAttribute>()?.OpCode == opCode);
+                var method = typeof(PickleOperations).GetMethods(BindingFlags.Static | BindingFlags.Public).FirstOrDefault(x => x.GetCustomAttribute<PickleMethodAttribute>()?.OpCode == opCode);
                 if (method == null)
                     throw new UnpicklingException($"No implementation for op-code '{opCode}' found!");
                 var arguments = new object?[method.GetParameters().Length];
