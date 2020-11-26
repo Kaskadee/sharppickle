@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.IO;
+using sharppickle.Attributes;
 using sharppickle.Exceptions;
 using sharppickle.Extensions;
 
@@ -15,6 +16,7 @@ namespace sharppickle.Internal {
         /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
         /// <param name="reader">The <see cref="BinaryReader"/> to read the byte array from.</param>
         /// <param name="pickleReader">The <see cref="PickleReader"/> to retrieve the out-of-band stream.</param>
+        [PickleMethod(PickleOpCodes.ByteArray8)]
         public static void PushByteArray8(Stack stack, BinaryReader reader, PickleReader pickleReader) {
             var length = reader.ReadLittleEndianNumber(8);
             var buffer = new byte[length];
