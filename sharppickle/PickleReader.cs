@@ -20,7 +20,7 @@ namespace sharppickle {
         /// <summary>
         ///     The highest protocol version that can be read by <see cref="PickleReader"/>.
         /// </summary>
-        public const int MaximumProtocolVersion = 3;
+        public const int MaximumProtocolVersion = 4;
 
         /// <summary>
         ///     Gets or sets the encoding used to encode strings read by <see cref="PickleOpCodes.String"/>, <see cref="PickleOpCodes.BinString"/> or <see cref="PickleOpCodes.ShortBinString"/>.

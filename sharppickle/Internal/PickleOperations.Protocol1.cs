@@ -36,8 +36,8 @@ namespace sharppickle.Internal {
         /// <param name="stack">The stack to discard the top from.</param>
         /// <returns>An list with the discarded items.</returns>
         [PickleMethod(PickleOpCodes.PopMark)]
-        public static IList PopMark(Stack stack) {
-            var list = new ArrayList();
+        public static List<object?> PopMark(Stack stack) {
+            var list = new List<object?>();
             while (stack.Count > 0) {
                 if (stack.Peek() is Mark) {
                     stack.Pop();

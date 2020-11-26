@@ -26,6 +26,9 @@ namespace sharppickle.Internal {
         [PickleMethod(PickleOpCodes.Ext4)]
         public static void Ext4Stub() => ThrowUnsupportedException();
 
+        [PickleMethod(PickleOpCodes.Frame)]
+        public static void FrameStub() => ThrowUnsupportedException();
+
         /// <summary>
         ///     Throws an instance of the <see cref="UnpicklingException"/> to indicate that an unsupported op-code has been found.
         /// </summary>
