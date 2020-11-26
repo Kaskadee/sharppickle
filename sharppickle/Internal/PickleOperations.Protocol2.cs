@@ -84,5 +84,17 @@ namespace sharppickle.Internal {
             var data = Encoding.UTF8.GetString(reader.ReadBytes(n));
             stack.Push(long.Parse(data, NumberStyles.Any, CultureInfo.InvariantCulture));
         }
+
+
+        /// <summary>
+        ///     Creates an instance of a previously pushed python type and pushes the instance to the stack.
+        /// </summary>
+        /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
+        [PickleMethod(PickleOpCodes.NewObj)]
+        public static void NewObj(Stack stack) {
+            var arg = stack.Pop();
+            var type = stack.Pop() as Type ?? throw new UnpicklingException("The second element on the stack is not a type!");
+            stack.Push(Instantiate(type, arg));
+        }
     }
 }

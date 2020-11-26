@@ -26,7 +26,7 @@ namespace sharppickle {
         ///     <para>The default value is ISO-8859-1 (Latin-1), to make sure that strings and byte arrays can be en-/decoded correctly equally. Change it at your own risk!</para>
         /// </summary>
         /// <remarks>If the value is set to <see langword="null"/>, the raw byte array will be pushed to the stack.</remarks>
-        public Encoding Encoding { get; set; } = Encoding.GetEncoding("ISO-8859-1");
+        public Encoding? Encoding { get; set; } = Encoding.GetEncoding("ISO-8859-1");
 
         private readonly IDictionary<string, IDictionary<string, Type>> _pythonProxyMappings = new Dictionary<string, IDictionary<string, Type>>();
 
@@ -93,7 +93,7 @@ namespace sharppickle {
                 var method = typeof(PickleOperations).GetMethods(BindingFlags.Static | BindingFlags.NonPublic).FirstOrDefault(x => x.GetCustomAttribute<PickleMethodAttribute>()?.OpCode == opCode);
                 if (method == null)
                     throw new UnpicklingException($"No implementation for op-code '{opCode}' found!");
-                var arguments = new object[method.GetParameters().Length];
+                var arguments = new object?[method.GetParameters().Length];
                 for (var i = 0; i < arguments.Length; i++) {
                     var type = method.GetParameters()[i].ParameterType;
                     if (type == typeof(Stack)) {

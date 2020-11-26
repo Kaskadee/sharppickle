@@ -155,7 +155,7 @@ namespace sharppickle.Internal {
             var str = stream.ReadLine();
             if (str.Length < 2 || str[0] != str.Last() || str[0] != '\'')
                 throw new UnpicklingException("The STRING op-code argument must be quoted");
-            stack.Push(str.Substring(1, str.Length - 2));
+            stack.Push(str[1..^1]);
         }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace sharppickle.Internal {
         /// <param name="reader">The <see cref="BinaryReader"/> to read the <see langword="string"/> from.</param>
         /// <param name="encoding">The <see cref="Encoding"/> to encode the string with.</param>
         [PickleMethod(PickleOpCodes.BinString)]
-        public static void PushBinaryString(Stack stack, BinaryReader reader, Encoding encoding) {
+        public static void PushBinaryString(Stack stack, BinaryReader reader, Encoding? encoding) {
             var length = reader.ReadLittleEndianInt32();
             if (length < 0)
                 throw new UnpicklingException("BINSTRING pickle has negative byte count");
@@ -184,7 +184,7 @@ namespace sharppickle.Internal {
         /// <param name="reader">The <see cref="BinaryReader"/> to read the <see langword="string"/> from.</param>
         /// <param name="encoding">The <see cref="Encoding"/> to encode the string with.</param>
         [PickleMethod(PickleOpCodes.ShortBinString)]
-        public static void PushShortBinaryString(Stack stack, BinaryReader reader, Encoding encoding) {
+        public static void PushShortBinaryString(Stack stack, BinaryReader reader, Encoding? encoding) {
             var length = reader.ReadByte();
             var data = reader.ReadBytes(length);
             if (encoding == null) {
@@ -230,7 +230,7 @@ namespace sharppickle.Internal {
         /// <param name="stream">The stream to read the index from.</param>
         /// <param name="memo">The memory to retrieve the value from.</param>
         [PickleMethod(PickleOpCodes.Get)]
-        public static void Get(Stack stack, Stream stream, IDictionary<int, object> memo) {
+        public static void Get(Stack stack, Stream stream, IDictionary<int, object?> memo) {
             var index = int.Parse(stream.ReadLine());
             stack.Push(memo[index]);
         }
@@ -242,7 +242,7 @@ namespace sharppickle.Internal {
         /// <param name="stream">The stream to read the index from.</param>
         /// <param name="memo">The memory to retrieve the value from.</param>
         [PickleMethod(PickleOpCodes.BinGet)]
-        public static void BinaryGet(Stack stack, Stream stream, IDictionary<int, object> memo) {
+        public static void BinaryGet(Stack stack, Stream stream, IDictionary<int, object?> memo) {
             var index = stream.ReadByte();
             stack.Push(memo[index]);
         }
@@ -254,7 +254,7 @@ namespace sharppickle.Internal {
         /// <param name="reader">The reader to read the index from.</param>
         /// <param name="memo">The memory to retrieve the value from.</param>
         [PickleMethod(PickleOpCodes.LongBinGet)]
-        public static void LongBinaryGet(Stack stack, BinaryReader reader, IDictionary<int, object> memo) {
+        public static void LongBinaryGet(Stack stack, BinaryReader reader, IDictionary<int, object?> memo) {
             var index = reader.ReadLittleEndianInt32();
             stack.Push(memo[index]);
         }
@@ -266,7 +266,7 @@ namespace sharppickle.Internal {
         /// <param name="stream">The stream to read the index from.</param>
         /// <param name="memo">The memory to retrieve the value from.</param>
         [PickleMethod(PickleOpCodes.Put)]
-        public static void Put(Stack stack, Stream stream, IDictionary<int, object> memo) {
+        public static void Put(Stack stack, Stream stream, IDictionary<int, object?> memo) {
             var i = int.Parse(stream.ReadLine());
             if (i < 0)
                 throw new UnpicklingException("Negative PUT argument.");
@@ -280,7 +280,7 @@ namespace sharppickle.Internal {
         /// <param name="stream">The stream to read the index from.</param>
         /// <param name="memo">The memory to retrieve the value from.</param>
         [PickleMethod(PickleOpCodes.BinPut)]
-        public static void BinaryPut(Stack stack, Stream stream, IDictionary<int, object> memo) {
+        public static void BinaryPut(Stack stack, Stream stream, IDictionary<int, object?> memo) {
             var i = stream.ReadByte();
             if (i < 0)
                 throw new UnpicklingException("Negative PUT argument.");
@@ -294,7 +294,7 @@ namespace sharppickle.Internal {
         /// <param name="reader">The reader to read the index from.</param>
         /// <param name="memo">The memory to retrieve the value from.</param>
         [PickleMethod(PickleOpCodes.LongBinPut)]
-        public static void LongBinaryPut(Stack stack, BinaryReader reader, IDictionary<int, object> memo) {
+        public static void LongBinaryPut(Stack stack, BinaryReader reader, IDictionary<int, object?> memo) {
             var i = reader.ReadLittleEndianInt32();
             if (i < 0)
                 throw new UnpicklingException("Negative PUT argument.");
@@ -311,9 +311,10 @@ namespace sharppickle.Internal {
         [PickleMethod(PickleOpCodes.Dict)]
         public static void CreateDictionary(Stack stack) {
             var items = PopMark(stack);
-            var dict = new Dictionary<object, object>();
+            var dict = new Dictionary<object, object?>();
             for (var i = 0; i < items.Count; i += 2) {
-                dict.Add(items[i], items[i + 1]);
+                var key = items[i] ?? throw new UnpicklingException("The key cannot be null.");
+                dict.Add(key, items[i + 1]);
             }
             stack.Push(dict);
         }
@@ -323,7 +324,7 @@ namespace sharppickle.Internal {
         /// </summary>
         /// <param name="stack">The stack to perform the operation on.</param>
         [PickleMethod(PickleOpCodes.EmptyDict)]
-        public static void CreateEmptyDictionary(Stack stack) => stack.Push(new Dictionary<object, object>());
+        public static void CreateEmptyDictionary(Stack stack) => stack.Push(new Dictionary<object, object?>());
 
         /// <summary>
         ///     Pushes an <see cref="IList"/> with the top most items to the stack.
@@ -337,7 +338,7 @@ namespace sharppickle.Internal {
         /// </summary>
         /// <param name="stack">The stack to perform the operation on.</param>
         [PickleMethod(PickleOpCodes.EmptyList)]
-        public static void CreateEmptyList(Stack stack) => stack.Push(new ArrayList());
+        public static void CreateEmptyList(Stack stack) => stack.Push(new List<object?>());
 
         /// <summary>
         ///     Pushes an <see cref="Array"/> wih the top most items to the stack.
@@ -356,7 +357,7 @@ namespace sharppickle.Internal {
         /// </summary>
         /// <param name="stack">The stack to perform the operation on.</param>
         [PickleMethod(PickleOpCodes.EmptyTuple)]
-        public static void CreateEmptyTuple(Stack stack) => stack.Push(new object[] { });
+        public static void CreateEmptyTuple(Stack stack) => stack.Push(Array.Empty<object>());
 
         #endregion
 
@@ -392,8 +393,8 @@ namespace sharppickle.Internal {
         [PickleMethod(PickleOpCodes.SetItem)]
         public static void SetItem(Stack stack) {
             var value = stack.Pop();
-            var key = stack.Pop();
-            var dict = stack.Peek<IDictionary<object, object>>();
+            var key = stack.Pop() ?? throw new UnpicklingException("The key cannot be null!");
+            var dict = stack.Peek<IDictionary<object, object?>>();
             if(!dict.ContainsKey(key))
                 dict.Add(key, value);
             else 
@@ -407,12 +408,13 @@ namespace sharppickle.Internal {
         [PickleMethod(PickleOpCodes.SetItems)]
         public static void SetItems(Stack stack) {
             var items = PopMark(stack);
-            var dict = stack.Peek<IDictionary<object, object>>();
+            var dict = stack.Peek<IDictionary<object, object?>>();
             for (var i = 0; i < items.Count; i += 2) {
-                if(!dict.ContainsKey(items[i]))
-                    dict.Add(items[i], items[i + 1]);
+                var key = items[i] ?? throw new UnpicklingException("The key cannot be null!");
+                if (!dict.ContainsKey(key))
+                    dict.Add(key, items[i + 1]);
                 else
-                    dict[items[i]] = items[i + 1];
+                    dict[key] = items[i + 1];
             }
         }
 
@@ -420,6 +422,10 @@ namespace sharppickle.Internal {
 
         #region Special
 
+        /// <summary>
+        ///     Calls <see cref="PythonObject.SetState"/> with arguments from the top elements of the stack.
+        /// </summary>
+        /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
         [PickleMethod(PickleOpCodes.Build)]
         public static void Build(Stack stack) {
             var state = stack.Pop();
@@ -427,6 +433,12 @@ namespace sharppickle.Internal {
             inst.SetState(state);
         }
 
+        /// <summary>
+        ///     Pushes a python type (mapped by a registered proxy object) to the stack.
+        /// </summary>
+        /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
+        /// <param name="stream">The <see cref="Stream"/> to read the module and type name from.</param>
+        /// <param name="reader">The <see cref="PickleReader"/> to get the proxy object from.</param>
         [PickleMethod(PickleOpCodes.Global)]
         public static void Global(Stack stack, Stream stream, PickleReader reader) {
             try {
@@ -436,6 +448,10 @@ namespace sharppickle.Internal {
             }
         }
 
+        /// <summary>
+        ///     Creates an instance of a previously pushed python type and pushes the instance to the stack.
+        /// </summary>
+        /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
         [PickleMethod(PickleOpCodes.Obj)]
         public static void Obj(Stack stack) {
             var args = PopMark(stack).Cast<object>().ToArray();
@@ -444,13 +460,12 @@ namespace sharppickle.Internal {
             stack.Push(Instantiate((args.First() as Type)!, args.Skip(1).ToArray()));
         }
 
-        [PickleMethod(PickleOpCodes.NewObj)]
-        public static void NewObj(Stack stack) {
-            var arg = stack.Pop();
-            var type = stack.Pop() as Type ?? throw new UnpicklingException("The second element on the stack is not a type!");
-            stack.Push(Instantiate(type, arg));
-        }
-
+        /// <summary>
+        ///     Creates a new instance of a python type (mapped by a registered proxy object) and pushes the instance to the stack.
+        /// </summary>
+        /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
+        /// <param name="stream">The <see cref="Stream"/> to read the module and type name from.</param>
+        /// <param name="reader">The <see cref="PickleReader"/> to get the proxy object from.</param>
         [PickleMethod(PickleOpCodes.Global)]
         public static void Inst(Stack stack, Stream stream, PickleReader reader) {
             try {
