@@ -466,7 +466,7 @@ namespace sharppickle.Internal {
         /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
         /// <param name="stream">The <see cref="Stream"/> to read the module and type name from.</param>
         /// <param name="reader">The <see cref="PickleReader"/> to get the proxy object from.</param>
-        [PickleMethod(PickleOpCodes.Global)]
+        [PickleMethod(PickleOpCodes.Inst)]
         public static void Inst(Stack stack, Stream stream, PickleReader reader) {
             try {
                 var type = reader.GetProxyObject(stream.ReadLine(), stream.ReadLine());
