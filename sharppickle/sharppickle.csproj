@@ -3,18 +3,19 @@
     <!-- Product Information -->
     <Product>sharppickle</Product>
     <Company>Fabian Creutz</Company>
-    <Copyright>Copyright © 2018-2020 Fabian Creutz</Copyright>
+    <Copyright>Copyright © 2018-2022 Fabian Creutz</Copyright>
     <!-- Assembly Version -->
     <Version>1.2.0</Version>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
     <!-- Compiler Properties -->
-    <TargetFramework>net5.0</TargetFramework>
-    <LangVersion>9.0</LangVersion>
-    <nullable>enable</nullable>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" />
+    <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" />
   </ItemGroup>
 </Project>
