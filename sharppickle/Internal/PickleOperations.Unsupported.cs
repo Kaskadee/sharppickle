@@ -2,10 +2,10 @@
 using sharppickle.Attributes;
 using sharppickle.Exceptions;
 
-namespace sharppickle.Internal; 
+namespace sharppickle.Internal;
 
 /// <summary>
-/// Provides stub methods for unsupported op-codes.
+///     Provides stub methods for unsupported op-codes.
 /// </summary>
 internal static partial class PickleOperations {
     [PickleMethod(PickleOpCodes.Reduce)]
@@ -36,7 +36,8 @@ internal static partial class PickleOperations {
     public static void ReadonlyBufferStub() => ThrowUnsupportedException();
 
     /// <summary>
-    /// Throws an instance of the <see cref="UnpicklingException"/> to indicate that an unsupported op-code has been found.
+    ///     Throws an instance of the <see cref="UnpicklingException" /> to indicate that an unsupported op-code has been
+    ///     found.
     /// </summary>
     /// <param name="callerMethod">The name of the caller method to parse the unsupported op-code from.</param>
     private static void ThrowUnsupportedException([CallerMemberName] string? callerMethod = null) {
