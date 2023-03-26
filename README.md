@@ -24,9 +24,9 @@ using(var reader = new PickleReader(new FileInfo("data.pickle")) {
 ### Example
 ---
 
-Please visit the [rpaextract](https://github.com/Kaskadee/rpaextract ) repository for an example application using `sharppickle`. Usage can be found in [Archive.cs](https://github.com/Kaskadee/rpaextract/src/branch/master/csharp/rpaextract/Archive.cs#L138 ).
+Please visit the [rpaextract](https://github.com/Kaskadee/rpaextract ) repository for an example application using `sharppickle`. Usage can be found in [Archive.cs](https://github.com/Kaskadee/rpaextract/blob/master/src/rpaextract/API/RenpyArchiveReader.cs#L72 ).
 
 ### License
 ---
 
-sharppickle is licensed under the [European Union Public Licence v1.2](https://github.com/Kaskadee/sharppickle/src/branch/master/LICENSE )
+sharppickle is licensed under the [European Union Public Licence v1.2](https://github.com/Kaskadee/sharppickle/blob/master/LICENSE )
