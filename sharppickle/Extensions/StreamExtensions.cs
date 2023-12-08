@@ -9,7 +9,7 @@ namespace sharppickle.Extensions;
 /// <summary>
 ///     Provides extension methods to simplify retrieving data from a <seealso cref="Stream" />.
 /// </summary>
-internal static class StreamExtensions {
+internal static partial class StreamExtensions {
     /// <summary>
     ///     Reads a string from the specified stream until a new line character (\n) has been read.
     /// </summary>
@@ -31,7 +31,7 @@ internal static class StreamExtensions {
     /// <returns>The read string with escaped characters.</returns>
     public static string ReadUnicodeString(this Stream stream) {
         var str = stream.ReadLine();
-        var regex = new Regex(@"[^\x00-\x7F]", RegexOptions.Compiled);
+        Regex regex = UnicodeRegex();
         return regex.Replace(str, c => $@"\u{(int)c.Value[0]:x4}");
     }
 
@@ -126,4 +126,10 @@ internal static class StreamExtensions {
         var bytesRead = stream.Read(buffer);
         return bytesRead == buffer.Length ? buffer : throw new UnpicklingException($"Buffer length mismatch! (read: {bytesRead}, required: {buffer.Length})");
     }
+
+    /// <summary>
+    /// Provides the regular expression for matching unicode strings.
+    /// </summary>
+    [GeneratedRegex(@"[^\x00-\x7F]", RegexOptions.Compiled)]
+    private static partial Regex UnicodeRegex();
 }
