@@ -17,22 +17,11 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     /// </summary>
     public const int MaximumProtocolVersion = 5;
 
-    /// <summary>
-    ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-    /// </summary>
-    public async ValueTask DisposeAsync() {
-        if (!this.leaveOpen)
-            await this.stream.DisposeAsync();
-    }
-
-    /// <summary>
-    ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-    /// </summary>
-    public void Dispose() {
-        if (!this.leaveOpen)
-            this.stream.Dispose();
-    }
-
+    private readonly Stream stream;
+    private readonly Stream? outOfBandStream;
+    private readonly bool leaveOpen;
+    private readonly Dictionary<string, IDictionary<string, Type>> pythonProxyMappings = new();
+    
     /// <summary>
     ///     Gets or sets the encoding used to encode strings read by <see cref="PickleOpCodes.String" />,
     ///     <see cref="PickleOpCodes.BinString" /> or <see cref="PickleOpCodes.ShortBinString" />.
@@ -43,14 +32,7 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     /// </summary>
     /// <remarks>If the value is set to <see langword="null" />, the raw byte array will be pushed to the stack.</remarks>
     public Encoding? Encoding { get; set; } = Encoding.GetEncoding("ISO-8859-1");
-
-    private readonly bool leaveOpen;
-    private readonly Stream? outOfBandStream;
-
-    private readonly IDictionary<string, IDictionary<string, Type>> pythonProxyMappings = new Dictionary<string, IDictionary<string, Type>>();
-
-    private readonly Stream stream;
-
+    
     /// <summary>
     ///     Initializes a new instance of the <see cref="PickleReader" /> class using the specified serialized data.
     /// </summary>
@@ -169,4 +151,19 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     /// </summary>
     /// <returns>The out-of-band stream or <c>null</c> if not applicable.</returns>
     internal Stream? GetOutOfBandStream() => this.outOfBandStream;
+    
+    /// <summary>
+    ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// </summary>
+    public void Dispose() {
+        if (!this.leaveOpen)
+            this.stream.Dispose();
+    }
+    
+    /// <summary>
+    ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// </summary>
+    public ValueTask DisposeAsync() {
+        return !this.leaveOpen ? this.stream.DisposeAsync() : ValueTask.CompletedTask;
+    }
 }
