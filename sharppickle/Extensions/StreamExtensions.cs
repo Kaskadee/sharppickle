@@ -19,7 +19,7 @@ internal static class StreamExtensions {
     public static string ReadLine(this Stream stream) {
         StringBuilder sb = new();
         int b;
-        while ((b = stream.ReadByte()) is not -1 or (byte)'\n')
+        while ((b = stream.ReadByte()) is not (-1 or (byte)'\n'))
             sb.Append(b);
         return sb.ToString();
     }
