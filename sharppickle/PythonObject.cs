@@ -17,8 +17,7 @@ public abstract class PythonObject {
     /// </summary>
     /// <param name="args">The arguments to create the object with.</param>
     protected PythonObject(params object?[] args) {
-        if (args == null)
-            throw new ArgumentNullException(nameof(args));
+        ArgumentNullException.ThrowIfNull(args);
     }
 
     /// <summary>
