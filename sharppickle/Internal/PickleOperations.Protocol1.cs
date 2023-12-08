@@ -403,10 +403,7 @@ internal static partial class PickleOperations {
         var value = stack.Pop();
         var key = stack.Pop() ?? throw new UnpicklingException("The key cannot be null!");
         IDictionary<object, object?> dict = stack.Peek<IDictionary<object, object?>>();
-        if (!dict.ContainsKey(key))
-            dict.Add(key, value);
-        else
-            dict[key] = value;
+        dict[key] = value;
     }
 
     /// <summary>
@@ -419,10 +416,7 @@ internal static partial class PickleOperations {
         IDictionary<object, object?> dict = stack.Peek<IDictionary<object, object?>>();
         for (var i = 0; i < items.Count; i += 2) {
             var key = items[i] ?? throw new UnpicklingException("The key cannot be null!");
-            if (!dict.ContainsKey(key))
-                dict.Add(key, items[i + 1]);
-            else
-                dict[key] = items[i + 1];
+            dict[key] = items[i + 1];
         }
     }
 
