@@ -111,4 +111,16 @@ internal static partial class PickleOperations {
     /// <param name="memo">The memo dictionary to store the element to.</param>
     [PickleMethod(PickleOpCodes.Memoize)]
     public static void Memoize(Stack stack, IDictionary<int, object?> memo) => memo.Add(memo.Count, stack.Peek());
+
+    /// <summary>
+    ///     Starts reading the frame from the stream.
+    /// </summary>
+    /// <param name="stack">The <see cref="Stack"/> to perform the operation on.</param>
+    /// <param name="stream">The <see cref="Stream"/> to read data from.</param>
+    /// <remarks>Frames are used to reduce the number of read calls, improving the performance by loading data chunkwise from the file.</remarks>
+    [PickleMethod(PickleOpCodes.Frame)]
+    public static void ReadFrame(Stack stack, Stream stream) {
+        // Skip frame size, since framing is not implemented.
+        stream.Seek(sizeof(long), SeekOrigin.Current);
+    }
 }

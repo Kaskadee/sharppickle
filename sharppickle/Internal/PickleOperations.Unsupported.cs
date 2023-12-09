@@ -26,9 +26,6 @@ internal static partial class PickleOperations {
     [PickleMethod(PickleOpCodes.Ext4)]
     public static void Ext4Stub() => ThrowUnsupportedException();
 
-    [PickleMethod(PickleOpCodes.Frame)]
-    public static void FrameStub() => ThrowUnsupportedException();
-
     [PickleMethod(PickleOpCodes.NextBuffer)]
     public static void NextBufferStub() => ThrowUnsupportedException();
 
