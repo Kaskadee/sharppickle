@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Frozen;
 using System.Reflection;
 using System.Text;
 using JetBrains.Annotations;
@@ -17,6 +18,7 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     /// </summary>
     public const int MaximumProtocolVersion = 5;
 
+    private readonly FrozenDictionary<PickleOpCodes, MethodInfo> methodMappings;
     private readonly Stream stream;
     private readonly Stream? outOfBandStream;
     private readonly bool leaveOpen;
@@ -57,15 +59,18 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     /// </param>
     /// <param name="outOfBandStream">The stream to read out-of-band data from (can be null).</param>
     public PickleReader(Stream stream, bool leaveOpen = false, Stream? outOfBandStream = null) {
-        if (stream == null)
-            throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream);
         if (!stream.CanRead || !stream.CanSeek)
             throw new NotSupportedException("The specified stream must be readable and seekable!");
+        this.stream = stream;
+        
         if (this.outOfBandStream?.CanRead == false)
             throw new NotSupportedException("The out-of-band stream must be readable!");
-        this.stream = stream;
+        
         this.leaveOpen = leaveOpen;
         this.outOfBandStream = outOfBandStream;
+        // Load the op-code method implementations for each defined op-code.
+        this.methodMappings = this.GetPickleMethodMappings();
     }
 
     /// <summary>
@@ -90,9 +95,7 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
             if (opCode == PickleOpCodes.Stop)
                 return stack.ToArray();
             // Find op-code implementation using reflection and the custom pickle method attribute.
-            MethodInfo? method = typeof(PickleOperations).GetMethods(BindingFlags.Static | BindingFlags.Public).FirstOrDefault(x => x.GetCustomAttribute<PickleMethodAttribute>()?.OpCode == opCode);
-            if (method == null)
-                throw new UnpicklingException($"No implementation for op-code '{opCode}' found!");
+            MethodInfo method = this.methodMappings[opCode];
             var arguments = new object?[method.GetParameters().Length];
             for (var i = 0; i < arguments.Length; i++) {
                 Type type = method.GetParameters()[i].ParameterType;
@@ -151,6 +154,26 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     /// </summary>
     /// <returns>The out-of-band stream or <c>null</c> if not applicable.</returns>
     internal Stream? GetOutOfBandStream() => this.outOfBandStream;
+
+    /// <summary>
+    /// Gets a dictionary of all <see cref="PickleOpCodes"/> with their corresponding method implementation as a <see cref="MethodInfo"/>.
+    /// </summary>
+    /// <returns>The dictionary of the op-code method implementation mappings as a <see cref="FrozenDictionary{TKey,TValue}"/>.</returns>
+    /// <exception cref="UnpicklingException">No implementation for the op-code {opCode} has been found.</exception>
+    private FrozenDictionary<PickleOpCodes, MethodInfo> GetPickleMethodMappings() {
+        // Get op-code method implementations from the PickleOperations class.
+        Type pickleOperationsType = typeof(PickleOperations);
+        var pickleOperationMethods = pickleOperationsType.GetMethods(BindingFlags.Static | BindingFlags.Public)
+                                                         .Where(x => x.GetCustomAttribute<PickleMethodAttribute>() is not null)
+                                                         .ToFrozenDictionary(k => k.GetCustomAttribute<PickleMethodAttribute>()!.OpCode, v => v);
+        // Validate that there is a method implementation for each defined op-code.
+        foreach (PickleOpCodes opCode in Enum.GetValues<PickleOpCodes>()) {
+            if (opCode is not PickleOpCodes.Stop and not PickleOpCodes.Proto && !pickleOperationMethods.ContainsKey(opCode))
+                throw new UnpicklingException($"No implementation for the op-code '{opCode}' has been found!");
+        }
+
+        return pickleOperationMethods;
+    }
     
     /// <summary>
     ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
