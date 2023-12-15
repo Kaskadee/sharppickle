@@ -21,7 +21,6 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
 
     private readonly FrozenDictionary<PickleOpCodes, Action<PickleReaderState>> methodMappings;
     private readonly Stream stream;
-    private readonly Stream? outOfBandStream;
     private readonly bool leaveOpen;
     private readonly Dictionary<string, IDictionary<string, Type>> pythonProxyMappings = new();
     
@@ -40,15 +39,13 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     ///     Initializes a new instance of the <see cref="PickleReader" /> class using the specified serialized data.
     /// </summary>
     /// <param name="data">The serialized data as a byte array.</param>
-    /// <param name="outOfBandStream">The stream to read out-of-band data from (can be null).</param>
-    public PickleReader(byte[] data, Stream? outOfBandStream = null) : this(new MemoryStream(data), outOfBandStream: outOfBandStream) { }
+    public PickleReader(byte[] data) : this(new MemoryStream(data)) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PickleReader" /> class using the specified file.
     /// </summary>
     /// <param name="file">The <see cref="FileInfo" /> for the file to load and read the serialized data from.</param>
-    /// <param name="outOfBandStream">The stream to read out-of-band data from (can be null).</param>
-    public PickleReader(FileInfo file, Stream? outOfBandStream = null) : this(file.Open(FileMode.Open, FileAccess.Read, FileShare.Read), outOfBandStream: outOfBandStream) { }
+    public PickleReader(FileInfo file) : this(file.Open(FileMode.Open, FileAccess.Read, FileShare.Read)) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PickleReader" /> class using the specified <seealso cref="Stream" />.
@@ -58,18 +55,12 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     ///     Whether to keep the underlying stream open, after the <see cref="PickleReader" /> instance is
     ///     disposed.
     /// </param>
-    /// <param name="outOfBandStream">The stream to read out-of-band data from (can be null).</param>
-    public PickleReader(Stream stream, bool leaveOpen = false, Stream? outOfBandStream = null) {
+    public PickleReader(Stream stream, bool leaveOpen = false) {
         ArgumentNullException.ThrowIfNull(stream);
         if (!stream.CanRead || !stream.CanSeek)
             throw new NotSupportedException("The specified stream must be readable and seekable!");
         this.stream = stream;
-        
-        if (this.outOfBandStream?.CanRead == false)
-            throw new NotSupportedException("The out-of-band stream must be readable!");
-        
         this.leaveOpen = leaveOpen;
-        this.outOfBandStream = outOfBandStream;
         // Load the op-code method implementations for each defined op-code.
         this.methodMappings = this.GetPickleMethodMappings();
     }
@@ -130,13 +121,7 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
             throw new ArgumentException($"No object with the specified name in the module {moduleName} exists: {name}", nameof(name));
         return this.pythonProxyMappings[moduleName][name];
     }
-
-    /// <summary>
-    ///     Gets the out-of-band stream if defined.
-    /// </summary>
-    /// <returns>The out-of-band stream or <c>null</c> if not applicable.</returns>
-    internal Stream? GetOutOfBandStream() => this.outOfBandStream;
-
+    
     /// <summary>
     /// Gets a dictionary of all <see cref="PickleOpCodes"/> with their corresponding method implementation as a <see cref="MethodInfo"/>.
     /// </summary>
