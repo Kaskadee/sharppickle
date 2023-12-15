@@ -14,9 +14,22 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Title>sharppickle</Title>
+    <Authors>Fabian Creutz</Authors>
+    <PackageProjectUrl>https://github.com/Kaskadee/sharppickle</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/Kaskadee/sharppickle/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageIcon>sharppickle.png</PackageIcon>
+    <RepositoryUrl>https://github.com/Kaskadee/sharppickle</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="sharppickle.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 </Project>
