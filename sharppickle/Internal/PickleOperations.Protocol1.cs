@@ -421,6 +421,9 @@ internal static partial class PickleOperations {
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.Global)]
     public static void Global(PickleReaderState state) {
+        // GLOBAL op-code has been deprecated in Protocol 4 and higher and is replaced with STACK_GLOBAL.
+        if (state.ProtocolVersion >= 4)
+            throw new ForbiddenOpCodeException("Forbidden op-code GLOBAL encountered in pickle when STACK_GLOBAL is expected.");
         try {
             state.Stack.Push(state.Reader.GetProxyObject(state.Stream.ReadLine(), state.Stream.ReadLine()));
         } catch (Exception ex) {
