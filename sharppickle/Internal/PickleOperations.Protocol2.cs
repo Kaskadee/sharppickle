@@ -1,5 +1,4 @@
 ﻿using System.Buffers.Binary;
-using System.Collections;
 using System.Globalization;
 using System.Text;
 using sharppickle.Attributes;

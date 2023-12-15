@@ -32,9 +32,15 @@ internal static partial class PickleOperations {
     ///     Discards the stack through the top most <see cref="Mark" /> object.
     /// </summary>
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
-    /// <returns>An list with the discarded items.</returns>
     [PickleMethod(PickleOpCodes.PopMark)]
-    public static List<object?> PopMark(PickleReaderState state) {
+    public static void PopMark(PickleReaderState state) => PopMarkInternal(state);
+
+    /// <summary>
+    ///     Discards the stack through the top most <see cref="Mark" /> object.
+    /// </summary>
+    /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
+    /// <returns>An list with the discarded items.</returns>
+    private static List<object?> PopMarkInternal(PickleReaderState state) {
         var list = new List<object?>();
         while (state.Stack.Count > 0) {
             if (state.Stack.Peek() is Mark) {
@@ -291,7 +297,7 @@ internal static partial class PickleOperations {
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.Dict)]
     public static void CreateDictionary(PickleReaderState state) {
-        List<object?> items = PopMark(state);
+        List<object?> items = PopMarkInternal(state);
         Dictionary<object, object?> dict = new();
         for (var i = 0; i < items.Count; i += 2) {
             var key = items[i] ?? throw new UnpicklingException("The key cannot be null.");
@@ -313,7 +319,7 @@ internal static partial class PickleOperations {
     /// </summary>
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.List)]
-    public static void CreateList(PickleReaderState state) => state.Stack.Push(PopMark(state));
+    public static void CreateList(PickleReaderState state) => state.Stack.Push(PopMarkInternal(state));
 
     /// <summary>
     ///     Pushes an empty <see cref="IList" /> to the top of the stack.
@@ -328,7 +334,7 @@ internal static partial class PickleOperations {
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.Tuple)]
     public static void CreateTuple(PickleReaderState state) {
-        List<object?> items = PopMark(state);
+        List<object?> items = PopMarkInternal(state);
         var arr = new object[items.Count];
         items.CopyTo(arr, 0);
         state.Stack.Push(arr);
@@ -362,7 +368,7 @@ internal static partial class PickleOperations {
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.Appends)]
     public static void Appends(PickleReaderState state) {
-        List<object?> items = PopMark(state);
+        List<object?> items = PopMarkInternal(state);
         IList list = state.Stack.Peek<IList>();
         foreach (var i in items)
             list.Add(i);
@@ -386,7 +392,7 @@ internal static partial class PickleOperations {
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.SetItems)]
     public static void SetItems(PickleReaderState state) {
-        List<object?> items = PopMark(state);
+        List<object?> items = PopMarkInternal(state);
         IDictionary<object, object?> dict = state.Stack.Peek<IDictionary<object, object?>>();
         for (var i = 0; i < items.Count; i += 2) {
             var key = items[i] ?? throw new UnpicklingException("The key cannot be null!");
@@ -428,7 +434,7 @@ internal static partial class PickleOperations {
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.Obj)]
     public static void Obj(PickleReaderState state) {
-        var args = PopMark(state).Cast<object>().ToArray();
+        var args = PopMarkInternal(state).Cast<object>().ToArray();
         if (args.FirstOrDefault() is not Type)
             throw new UnpicklingException("The first element on the stack is not a type or null!");
         state.Stack.Push(Instantiate((args.First() as Type)!, args.Skip(1).ToArray()));
@@ -442,7 +448,7 @@ internal static partial class PickleOperations {
     public static void Inst(PickleReaderState state) {
         try {
             Type type = state.Reader.GetProxyObject(state.Stream.ReadLine(), state.Stream.ReadLine());
-            var args = PopMark(state).Cast<object>().ToArray();
+            var args = PopMarkInternal(state).Cast<object>().ToArray();
             state.Stack.Push(Instantiate(type, args));
         } catch (Exception ex) {
             throw new UnpicklingException("An exception occured trying to proccess the INST op-code!", ex);

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using sharppickle.Attributes;
+﻿using sharppickle.Attributes;
 using sharppickle.Exceptions;
 using sharppickle.Extensions;
 

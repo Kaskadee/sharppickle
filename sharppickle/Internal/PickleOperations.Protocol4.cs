@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Text;
 using sharppickle.Attributes;
 using sharppickle.Exceptions;
@@ -61,7 +60,7 @@ internal static partial class PickleOperations {
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.AddItems)]
     public static void AddItems(PickleReaderState state) {
-        List<object?> elements = PopMark(state);
+        List<object?> elements = PopMarkInternal(state);
         ICollection<object?> set = state.Stack.Peek<ICollection<object?>>();
         foreach (var element in elements)
             set.Add(element);
@@ -73,7 +72,7 @@ internal static partial class PickleOperations {
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.FrozenSet)]
     public static void PushFrozenSet(PickleReaderState state) {
-        List<object?> elements = PopMark(state);
+        List<object?> elements = PopMarkInternal(state);
         state.Stack.Push(new HashSet<object?>(elements).ToImmutableHashSet());
     }
 

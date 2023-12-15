@@ -18,7 +18,7 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     /// </summary>
     public const int MaximumProtocolVersion = 5;
 
-    private readonly FrozenDictionary<PickleOpCodes, MethodInfo> methodMappings;
+    private readonly FrozenDictionary<PickleOpCodes, Action<PickleReaderState>> methodMappings;
     private readonly Stream stream;
     private readonly Stream? outOfBandStream;
     private readonly bool leaveOpen;
@@ -95,10 +95,8 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
             // Check if STOP signal has been reached.
             if (opCode == PickleOpCodes.Stop)
                 return stack.ToArray();
-            // Find op-code implementation using reflection and the custom pickle method attribute.
-            MethodInfo method = this.methodMappings[opCode];
-            var arguments = new object[] { state };
-            method.Invoke(null, arguments);
+            // Get and invoke op-code implementation from the mappings dictionary.
+            this.methodMappings[opCode].Invoke(state);
         }
 
         throw new UnpicklingException("EOF reached without STOP signal.");
@@ -145,14 +143,14 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     /// </summary>
     /// <returns>The dictionary of the op-code method implementation mappings as a <see cref="FrozenDictionary{TKey,TValue}"/>.</returns>
     /// <exception cref="UnpicklingException">No implementation for the op-code {opCode} has been found.</exception>
-    private FrozenDictionary<PickleOpCodes, MethodInfo> GetPickleMethodMappings() {
+    private FrozenDictionary<PickleOpCodes, Action<PickleReaderState>> GetPickleMethodMappings() {
         // Get op-code method implementations from the PickleOperations class.
         Type pickleOperationsType = typeof(PickleOperations);
         Type pickleReaderStateType = typeof(PickleReaderState);
         var pickleOperationMethods = pickleOperationsType.GetMethods(BindingFlags.Static | BindingFlags.Public)
                                                          .Where(x => x.GetCustomAttribute<PickleMethodAttribute>() is not null)
                                                          .Where(x => x.GetParameters().Length == 1 && x.GetParameters().Single().ParameterType == pickleReaderStateType)
-                                                         .ToFrozenDictionary(k => k.GetCustomAttribute<PickleMethodAttribute>()!.OpCode, v => v);
+                                                         .ToFrozenDictionary(k => k.GetCustomAttribute<PickleMethodAttribute>()!.OpCode, v => (Action<PickleReaderState>)v.CreateDelegate(typeof(Action<PickleReaderState>)));
         // Validate that there is a method implementation for each defined op-code.
         foreach (PickleOpCodes opCode in Enum.GetValues<PickleOpCodes>()) {
             if (opCode is not PickleOpCodes.Stop and not PickleOpCodes.Proto && !pickleOperationMethods.ContainsKey(opCode))
