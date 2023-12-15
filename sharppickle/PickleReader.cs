@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using sharppickle.Attributes;
 using sharppickle.Exceptions;
 using sharppickle.Internal;
+using sharppickle.IO;
 
 namespace sharppickle;
 
@@ -19,11 +20,10 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     /// </summary>
     public const int MaximumProtocolVersion = 5;
 
-    private readonly Stream stream;
+    private readonly FrameStream stream;
     private readonly IEnumerator<Memory<byte>>? buffers;
     private readonly FrozenDictionary<PickleOpCodes, Action<PickleReaderState>> methodMappings;
     private readonly Dictionary<string, IDictionary<string, Type>> pythonProxyMappings = new();
-    private readonly bool leaveOpen;
     
     /// <summary>
     ///     Gets or sets the encoding used to encode strings read by <see cref="PickleOpCodes.String" />,
@@ -60,9 +60,8 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
         ArgumentNullException.ThrowIfNull(stream);
         if (!stream.CanRead || !stream.CanSeek)
             throw new NotSupportedException("The specified stream must be readable and seekable!");
-        this.stream = stream;
+        this.stream = new(stream, leaveOpen);
         this.buffers = buffers?.GetEnumerator();
-        this.leaveOpen = leaveOpen;
         // Load the op-code method implementations for each defined op-code.
         this.methodMappings = this.GetPickleMethodMappings();
     }
@@ -171,8 +170,7 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     /// </summary>
     public void Dispose() {
         this.buffers?.Dispose();
-        if (!this.leaveOpen)
-            this.stream.Dispose();
+        this.stream.Dispose();
     }
     
     /// <summary>
@@ -180,6 +178,6 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     /// </summary>
     public ValueTask DisposeAsync() {
         this.buffers?.Dispose();
-        return !this.leaveOpen ? this.stream.DisposeAsync() : ValueTask.CompletedTask;
+        return this.stream.DisposeAsync();
     }
 }

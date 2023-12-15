@@ -3,6 +3,7 @@ using System.Text;
 using sharppickle.Attributes;
 using sharppickle.Exceptions;
 using sharppickle.Extensions;
+using sharppickle.IO;
 
 namespace sharppickle.Internal;
 
@@ -113,7 +114,8 @@ internal static partial class PickleOperations {
     /// <remarks>Frames are used to reduce the number of read calls, improving the performance by loading data chunkwise from the file.</remarks>
     [PickleMethod(PickleOpCodes.Frame)]
     public static void ReadFrame(PickleReaderState state) {
-        // Skip frame size, since framing is not implemented.
-        state.Stream.Seek(sizeof(long), SeekOrigin.Current);
+        // Read frame size from the stream.
+        var frameSize = state.Stream.ReadInt64LittleEndian();
+        (state.Stream as FrameStream)!.ReadFrame(frameSize);
     }
 }
