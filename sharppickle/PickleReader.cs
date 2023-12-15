@@ -122,7 +122,7 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     /// <param name="moduleName">The name of the module under which to register the object.</param>
     /// <param name="name">The name mapping of the object.</param>
     public void RegisterObject<T>(string moduleName, string name) where T : PythonObject, new() {
-        if (this.pythonProxyMappings.ContainsKey(moduleName) && this.pythonProxyMappings[moduleName].ContainsKey(name))
+        if(this.pythonProxyMappings.TryGetValue(moduleName, out IDictionary<string, Type>? module) && module.ContainsKey(name))
             throw new ArgumentException("A proxy object with the specified name already exists.", nameof(name));
         if (!this.pythonProxyMappings.ContainsKey(moduleName))
             this.pythonProxyMappings[moduleName] = new Dictionary<string, Type>();
@@ -136,11 +136,11 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     /// <param name="name">The name of the type that is being proxied.</param>
     /// <returns>The registered proxy type for the python type.</returns>
     internal Type GetProxyObject(string moduleName, string name) {
-        if (!this.pythonProxyMappings.ContainsKey(moduleName))
+        if (!this.pythonProxyMappings.TryGetValue(moduleName, out IDictionary<string, Type>? module))
             throw new ArgumentException($"No module with the specified name exists: {moduleName}", nameof(moduleName));
-        if (!this.pythonProxyMappings[moduleName].ContainsKey(name))
+        if (!module.TryGetValue(name, out Type? type))
             throw new ArgumentException($"No object with the specified name in the module {moduleName} exists: {name}", nameof(name));
-        return this.pythonProxyMappings[moduleName][name];
+        return type;
     }
     
     /// <summary>
