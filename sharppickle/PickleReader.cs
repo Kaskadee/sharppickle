@@ -45,7 +45,7 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     ///     Initializes a new instance of the <see cref="PickleReader" /> class using the specified file.
     /// </summary>
     /// <param name="file">The <see cref="FileInfo" /> for the file to load and read the serialized data from.</param>
-    public PickleReader(FileInfo file) : this(file.Open(FileMode.Open, FileAccess.Read, FileShare.Read)) { }
+    public PickleReader(FileInfo file) : this(file.Open(new FileStreamOptions { Mode = FileMode.Open, Access = FileAccess.Read, Share = FileShare.Read, Options = FileOptions.SequentialScan })) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PickleReader" /> class using the specified <seealso cref="Stream" />.
