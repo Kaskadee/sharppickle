@@ -75,7 +75,6 @@ internal static partial class PickleOperations {
 
         // Allocate buffer and clear it before reading.
         Span<byte> buffer = stackalloc byte[sizeof(long)];
-        buffer.Clear();
         if (state.Stream.Read(buffer[..length]) != length)
             throw new UnpicklingException($"Buffer length mismatch! (expected {length} bytes)");
         state.Stack.Push(BinaryPrimitives.ReadInt64LittleEndian(buffer));
