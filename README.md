@@ -5,9 +5,12 @@ Parser for serialized python pickles written in C#/.NET Core
 ### Why?
 ---
 
-This repository should be seen as a proof-of-concept. **DO NOT USE** Python's `pickle` module as a way to communicate between your python script and your application. [Especially since the `pickle` module is unsecure](https://docs.python.org/3/library/pickle.html ) as it allows to execute arbitrary code during unpickling!
+This repository should be seen as a proof-of-concept. 
 
-To exchange data use a language-independant serialization format such as [JSON](https://en.wikipedia.org/wiki/JSON ) or [XML](https://en.wikipedia.org/wiki/XML ).
+**Do not unpickle data received from an untrusted or unauthenticated source.**  
+[The `pickle` module allows to execute arbitrary code during unpickling](https://docs.python.org/3/library/pickle.html )
+
+To exchange data use a language-independent serialization format such as [JSON](https://en.wikipedia.org/wiki/JSON ) or [XML](https://en.wikipedia.org/wiki/XML ).
 
 ### How to use
 ---
