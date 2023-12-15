@@ -12,6 +12,7 @@ namespace sharppickle;
 /// <summary>
 ///     Provides a fully-managed deserializer for data serialized using the Python Pickle format.
 /// </summary>
+[PublicAPI]
 public sealed class PickleReader : IDisposable, IAsyncDisposable {
     /// <summary>
     ///     The highest protocol version that can be read by <see cref="PickleReader" />.
@@ -77,7 +78,6 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     ///     Deserializes the previous specified data and returns the deserialized data objects.
     /// </summary>
     /// <returns>The deserialized objects as an array of objects.</returns>
-    [PublicAPI]
     public object?[] Unpickle() {
         // Check if pickle version is supported.
         var version = this.stream.ReadByte() != (byte)PickleOpCodes.Proto ? 1 : PickleOperations.GetProtocolVersion(this.stream);
@@ -109,7 +109,6 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     /// <typeparam name="T">The type of the python object to register.</typeparam>
     /// <param name="moduleName">The name of the module under which to register the object.</param>
     /// <param name="name">The name mapping of the object.</param>
-    [PublicAPI]
     public void RegisterObject<T>(string moduleName, string name) where T : PythonObject, new() {
         if (this.pythonProxyMappings.ContainsKey(moduleName) && this.pythonProxyMappings[moduleName].ContainsKey(name))
             throw new ArgumentException("A proxy object with the specified name already exists.", nameof(name));
