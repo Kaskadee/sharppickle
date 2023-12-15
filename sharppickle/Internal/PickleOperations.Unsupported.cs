@@ -25,13 +25,7 @@ internal static partial class PickleOperations {
 
     [PickleMethod(PickleOpCodes.Ext4)]
     public static void Ext4Stub(PickleReaderState state) => ThrowUnsupportedException();
-
-    [PickleMethod(PickleOpCodes.NextBuffer)]
-    public static void NextBufferStub(PickleReaderState state) => ThrowUnsupportedException();
-
-    [PickleMethod(PickleOpCodes.ReadonlyBuffer)]
-    public static void ReadonlyBufferStub(PickleReaderState state) => ThrowUnsupportedException();
-
+    
     /// <summary>
     ///     Throws an instance of the <see cref="UnpicklingException" /> to indicate that an unsupported op-code has been
     ///     found.

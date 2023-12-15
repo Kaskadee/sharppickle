@@ -19,10 +19,11 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     /// </summary>
     public const int MaximumProtocolVersion = 5;
 
-    private readonly FrozenDictionary<PickleOpCodes, Action<PickleReaderState>> methodMappings;
     private readonly Stream stream;
-    private readonly bool leaveOpen;
+    private readonly IEnumerator<Memory<byte>>? buffers;
+    private readonly FrozenDictionary<PickleOpCodes, Action<PickleReaderState>> methodMappings;
     private readonly Dictionary<string, IDictionary<string, Type>> pythonProxyMappings = new();
+    private readonly bool leaveOpen;
     
     /// <summary>
     ///     Gets or sets the encoding used to encode strings read by <see cref="PickleOpCodes.String" />,
@@ -39,27 +40,28 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     ///     Initializes a new instance of the <see cref="PickleReader" /> class using the specified serialized data.
     /// </summary>
     /// <param name="data">The serialized data as a byte array.</param>
-    public PickleReader(byte[] data) : this(new MemoryStream(data)) { }
+    /// <param name="buffers">The collection of out-of-band buffers (as <see cref="Memory{T}"/> of bytes).</param>
+    public PickleReader(byte[] data, IEnumerable<Memory<byte>>? buffers = null) : this(new MemoryStream(data), buffers: buffers) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PickleReader" /> class using the specified file.
     /// </summary>
     /// <param name="file">The <see cref="FileInfo" /> for the file to load and read the serialized data from.</param>
-    public PickleReader(FileInfo file) : this(file.Open(new FileStreamOptions { Mode = FileMode.Open, Access = FileAccess.Read, Share = FileShare.Read, Options = FileOptions.SequentialScan })) { }
+    /// <param name="buffers">The collection of out-of-band buffers (as <see cref="Memory{T}"/> of bytes).</param>
+    public PickleReader(FileInfo file, IEnumerable<Memory<byte>>? buffers = null) : this(file.Open(new FileStreamOptions { Mode = FileMode.Open, Access = FileAccess.Read, Share = FileShare.Read, Options = FileOptions.SequentialScan }), buffers: buffers) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PickleReader" /> class using the specified <seealso cref="Stream" />.
     /// </summary>
     /// <param name="stream">The <seealso cref="Stream" /> to read the serialized data from.</param>
-    /// <param name="leaveOpen">
-    ///     Whether to keep the underlying stream open, after the <see cref="PickleReader" /> instance is
-    ///     disposed.
-    /// </param>
-    public PickleReader(Stream stream, bool leaveOpen = false) {
+    /// <param name="leaveOpen">Whether to keep the underlying stream open, after the <see cref="PickleReader" /> instance is disposed.</param>
+    /// <param name="buffers">The collection of out-of-band buffers (as <see cref="Memory{T}"/> of bytes).</param>
+    public PickleReader(Stream stream, bool leaveOpen = false, IEnumerable<Memory<byte>>? buffers = null) {
         ArgumentNullException.ThrowIfNull(stream);
         if (!stream.CanRead || !stream.CanSeek)
             throw new NotSupportedException("The specified stream must be readable and seekable!");
         this.stream = stream;
+        this.buffers = buffers?.GetEnumerator();
         this.leaveOpen = leaveOpen;
         // Load the op-code method implementations for each defined op-code.
         this.methodMappings = this.GetPickleMethodMappings();
@@ -91,6 +93,26 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
         }
 
         throw new UnpicklingException("EOF reached without STOP signal.");
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the current <see cref="PickleReader"/> has been provided with out-of-band buffers.
+    /// </summary>
+    /// <returns><c>true</c>, if out-of-band buffers are available; otherwise <c>false</c>.</returns>
+    internal bool HasBuffers() => this.buffers is not null;
+
+    /// <summary>
+    /// Gets the next buffer as a <see cref="Memory{T}"/> of bytes from the specified buffers.
+    /// </summary>
+    /// <returns>The next buffer from the buffer iterable.</returns>
+    /// <exception cref="UnpicklingException">No buffers have been specified.</exception>
+    internal Memory<byte> GetNextBuffer() {
+        if (this.buffers is null)
+            throw new UnpicklingException("No out-of-band buffers have been specified.");
+        if (!this.buffers.MoveNext())
+            throw new UnpicklingException("Not enough out-of-band buffers provided.");
+        Memory<byte> buffer = this.buffers.Current;
+        return buffer;
     }
 
     /// <summary>
@@ -148,6 +170,7 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
     /// </summary>
     public void Dispose() {
+        this.buffers?.Dispose();
         if (!this.leaveOpen)
             this.stream.Dispose();
     }
@@ -156,6 +179,7 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
     /// </summary>
     public ValueTask DisposeAsync() {
+        this.buffers?.Dispose();
         return !this.leaveOpen ? this.stream.DisposeAsync() : ValueTask.CompletedTask;
     }
 }
