@@ -17,7 +17,8 @@
     <Title>sharppickle</Title>
     <Authors>Fabian Creutz</Authors>
     <PackageProjectUrl>https://github.com/Kaskadee/sharppickle</PackageProjectUrl>
-    <PackageLicense>EUPL-1.2</PackageLicense>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>EUPL-1.2</PackageLicenseExpression>
     <PackageIcon>sharppickle.png</PackageIcon>
     <RepositoryUrl>https://github.com/Kaskadee/sharppickle</RepositoryUrl>
   </PropertyGroup>
