@@ -85,6 +85,7 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
             throw new NotSupportedException($"The specified pickle is currently not supported. (version: {version})");
         var stack = new Stack();
         var memo = new Dictionary<int, object?>();
+        PickleReaderState state = new(version, this.stream, stack, memo, this.Encoding, this);
         // Read file until either STOP signal has been found or stream has reached EOF.
         while (this.stream.Position != this.stream.Length) {
             var opByte = (byte)this.stream.ReadByte();
@@ -96,23 +97,7 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
                 return stack.ToArray();
             // Find op-code implementation using reflection and the custom pickle method attribute.
             MethodInfo method = this.methodMappings[opCode];
-            var arguments = new object?[method.GetParameters().Length];
-            for (var i = 0; i < arguments.Length; i++) {
-                Type type = method.GetParameters()[i].ParameterType;
-                if (type == typeof(Stack))
-                    arguments[i] = stack;
-                else if (type == typeof(Stream))
-                    arguments[i] = this.stream;
-                else if (type == typeof(Dictionary<int, object?>) || type == typeof(IDictionary<int, object?>))
-                    arguments[i] = memo;
-                else if (type == typeof(Encoding))
-                    arguments[i] = this.Encoding;
-                else if (type == typeof(PickleReader))
-                    arguments[i] = this;
-                else
-                    throw new UnpicklingException($"Unknown argument for op-code implementation '{opCode}': {type}");
-            }
-
+            var arguments = new object[] { state };
             method.Invoke(null, arguments);
         }
 
@@ -163,8 +148,10 @@ public sealed class PickleReader : IDisposable, IAsyncDisposable {
     private FrozenDictionary<PickleOpCodes, MethodInfo> GetPickleMethodMappings() {
         // Get op-code method implementations from the PickleOperations class.
         Type pickleOperationsType = typeof(PickleOperations);
+        Type pickleReaderStateType = typeof(PickleReaderState);
         var pickleOperationMethods = pickleOperationsType.GetMethods(BindingFlags.Static | BindingFlags.Public)
                                                          .Where(x => x.GetCustomAttribute<PickleMethodAttribute>() is not null)
+                                                         .Where(x => x.GetParameters().Length == 1 && x.GetParameters().Single().ParameterType == pickleReaderStateType)
                                                          .ToFrozenDictionary(k => k.GetCustomAttribute<PickleMethodAttribute>()!.OpCode, v => v);
         // Validate that there is a method implementation for each defined op-code.
         foreach (PickleOpCodes opCode in Enum.GetValues<PickleOpCodes>()) {

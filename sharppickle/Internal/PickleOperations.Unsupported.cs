@@ -9,28 +9,28 @@ namespace sharppickle.Internal;
 /// </summary>
 internal static partial class PickleOperations {
     [PickleMethod(PickleOpCodes.Reduce)]
-    public static void ReduceStub() => ThrowUnsupportedException();
+    public static void ReduceStub(PickleReaderState state) => ThrowUnsupportedException();
 
     [PickleMethod(PickleOpCodes.PersId)]
-    public static void PersIdStub() => ThrowUnsupportedException();
+    public static void PersIdStub(PickleReaderState state) => ThrowUnsupportedException();
 
     [PickleMethod(PickleOpCodes.BinPersId)]
-    public static void BinPersIdStub() => ThrowUnsupportedException();
+    public static void BinPersIdStub(PickleReaderState state) => ThrowUnsupportedException();
 
     [PickleMethod(PickleOpCodes.Ext1)]
-    public static void Ext1Stub() => ThrowUnsupportedException();
+    public static void Ext1Stub(PickleReaderState state) => ThrowUnsupportedException();
 
     [PickleMethod(PickleOpCodes.Ext2)]
-    public static void Ext2Stub() => ThrowUnsupportedException();
+    public static void Ext2Stub(PickleReaderState state) => ThrowUnsupportedException();
 
     [PickleMethod(PickleOpCodes.Ext4)]
-    public static void Ext4Stub() => ThrowUnsupportedException();
+    public static void Ext4Stub(PickleReaderState state) => ThrowUnsupportedException();
 
     [PickleMethod(PickleOpCodes.NextBuffer)]
-    public static void NextBufferStub() => ThrowUnsupportedException();
+    public static void NextBufferStub(PickleReaderState state) => ThrowUnsupportedException();
 
     [PickleMethod(PickleOpCodes.ReadonlyBuffer)]
-    public static void ReadonlyBufferStub() => ThrowUnsupportedException();
+    public static void ReadonlyBufferStub(PickleReaderState state) => ThrowUnsupportedException();
 
     /// <summary>
     ///     Throws an instance of the <see cref="UnpicklingException" /> to indicate that an unsupported op-code has been

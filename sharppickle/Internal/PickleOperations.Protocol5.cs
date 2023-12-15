@@ -13,17 +13,15 @@ internal static partial class PickleOperations {
     ///     Pushes a byte array to the stack with the length read from the stream and the contents read from the out-of-band
     ///     stream.
     /// </summary>
-    /// <param name="stack">The <see cref="Stack" /> to perform the operation on.</param>
-    /// <param name="stream">The <see cref="Stream" /> to read the length of the data from.</param>
-    /// <param name="pickleReader">The <see cref="PickleReader" /> to retrieve the out-of-band stream.</param>
+    /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.ByteArray8)]
-    public static void PushByteArray8(Stack stack, Stream stream, PickleReader pickleReader) {
+    public static void PushByteArray8(PickleReaderState state) {
         // Check if out-of-band stream is available.
-        if (pickleReader.GetOutOfBandStream() is not { } outOfBandStream)
+        if (state.Reader.GetOutOfBandStream() is not { } outOfBandStream)
             throw new UnpicklingException("Out-of-band stream not available.");
         // Read length of data to read from out-of-band stream to buffer.
-        var length = stream.ReadInt64LittleEndian();
+        var length = state.Stream.ReadInt64LittleEndian();
         ReadOnlyMemory<byte> data = outOfBandStream.ReadMemory(length);
-        stack.Push(data);
+        state.Stack.Push(data);
     }
 }

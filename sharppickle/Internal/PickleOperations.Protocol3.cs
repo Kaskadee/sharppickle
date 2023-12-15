@@ -13,29 +13,27 @@ internal static partial class PickleOperations {
     ///     Reads the length of the data, then reads the amount of bytes from the stream and pushes the byte array to the top
     ///     of the stack.
     /// </summary>
-    /// <param name="stack">The <see cref="Stack" /> to perform the operation on.</param>
-    /// <param name="stream">The <see cref="Stream" /> to read the data from.</param>
+    /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.BinaryBytes)]
-    public static void PushBytes(Stack stack, Stream stream) {
-        var length = stream.ReadInt32LittleEndian();
-        ReadOnlyMemory<byte> buffer = stream.ReadMemory(length);
-        stack.Push(buffer);
+    public static void PushBytes(PickleReaderState state) {
+        var length = state.Stream.ReadInt32LittleEndian();
+        ReadOnlyMemory<byte> buffer = state.Stream.ReadMemory(length);
+        state.Stack.Push(buffer);
     }
 
     /// <summary>
     ///     Reads the length of the data (as a <see langword="byte" />), then reads the amount of bytes from the stream and
     ///     pushes the byte array to the top of the stack.
     /// </summary>
-    /// <param name="stack">The <see cref="Stack" /> to perform the operation on.</param>
-    /// <param name="stream">The <see cref="Stream" /> to read the data from.</param>
+    /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.ShortBinaryBytes)]
-    public static void PushShortBytes(Stack stack, Stream stream) {
+    public static void PushShortBytes(PickleReaderState state) {
         // Read byte as length prefix.
-        var length = stream.ReadByte();
+        var length = state.Stream.ReadByte();
         if (length == -1)
             throw new UnpicklingException("EOF reached.");
         // Read number of bytes and push them to the stack.
-        ReadOnlyMemory<byte> buffer = stream.ReadMemory(length);
-        stack.Push(buffer);
+        ReadOnlyMemory<byte> buffer = state.Stream.ReadMemory(length);
+        state.Stack.Push(buffer);
     }
 }
