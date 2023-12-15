@@ -5,7 +5,7 @@
     <Company>Fabian Creutz</Company>
     <Copyright>Copyright © 2018-2023 Fabian Creutz</Copyright>
     <!-- Assembly Version -->
-    <Version>1.4.1</Version>
+    <Version>1.5.0</Version>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
     <!-- Compiler Properties -->
@@ -13,6 +13,7 @@
     <LangVersion>12.0</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
