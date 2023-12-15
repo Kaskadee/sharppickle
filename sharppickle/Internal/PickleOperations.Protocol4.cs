@@ -94,8 +94,8 @@ internal static partial class PickleOperations {
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.StackGlobal)]
     public static void LoadStackGlobal(PickleReaderState state) {
-        var name = state.Stack.Pop() as string ?? throw new UnpicklingException("The top-most item on the stack was not a string!");
-        var module = state.Stack.Pop() as string ?? throw new UnpicklingException("The top-most item on the stack was not a string!");
+        var name = state.Stack.Pop<string>();
+        var module = state.Stack.Pop<string>();
         state.Stack.Push(state.Reader.GetProxyObject(module, name));
     }
 
