@@ -98,8 +98,8 @@ internal static partial class PickleOperations {
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.NewObj)]
     public static void NewObj(PickleReaderState state) {
-        var arg = state.Stack.Pop();
-        Type type = state.Stack.Pop() as Type ?? throw new UnpicklingException("The second element on the stack is not a type!");
-        state.Stack.Push(Instantiate(type, arg));
+        var args = state.Stack.Pop();
+        Type type = state.Stack.Pop<Type>();
+        state.Stack.Push(Instantiate(type, args?.GetType().IsArray == true ? args as object[] : [args]));
     }
 }

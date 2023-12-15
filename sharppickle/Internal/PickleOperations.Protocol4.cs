@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Frozen;
+using System.Collections.Immutable;
 using System.Text;
 using sharppickle.Attributes;
 using sharppickle.Exceptions;
@@ -8,18 +9,18 @@ using sharppickle.IO;
 namespace sharppickle.Internal;
 
 /// <summary>
-///     Provides the implementation of all op-codes defined in protocol version 4.x.
+/// Provides the implementation of all op-codes defined in protocol version 4.x.
 /// </summary>
 internal static partial class PickleOperations {
     /// <summary>
-    ///     Pushes a UTF-8 string to the stack with the length read as a single byte.
+    /// Pushes a UTF-8 string to the stack with the length read as a single byte.
     /// </summary>
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.ShortBinaryUnicode)]
     public static void PushShortBinaryUnicode(PickleReaderState state) {
         var length = state.Stream.ReadByte();
         if (length == -1)
-            throw new UnpicklingException("EOF reached.");
+            throw new UnpicklingException("End-of-file has been reached before the STOP op-code.");
         Span<byte> buffer = stackalloc byte[length];
         if (state.Stream.Read(buffer) != buffer.Length)
             throw new UnpicklingException($"Buffer length mismatch! (expected {buffer.Length} bytes)");
@@ -27,7 +28,7 @@ internal static partial class PickleOperations {
     }
 
     /// <summary>
-    ///     Pushes a UTF-8 string to the stack with the length read as a 8-byte long.
+    /// Pushes a UTF-8 string to the stack with the length read as a 8-byte long.
     /// </summary>
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.BinaryUnicode8)]
@@ -38,7 +39,7 @@ internal static partial class PickleOperations {
     }
 
     /// <summary>
-    ///     Pushes a byte array to the stack with the length read as a 8-byte long.
+    /// Pushes a byte array to the stack with the length read as a 8-byte long.
     /// </summary>
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.BinaryBytes8)]
@@ -49,14 +50,14 @@ internal static partial class PickleOperations {
     }
 
     /// <summary>
-    ///     Pushes an empty <see cref="HashSet{T}" /> to the stack.
+    /// Pushes an empty <see cref="HashSet{T}" /> to the stack.
     /// </summary>
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.EmptySet)]
     public static void PushEmptySet(PickleReaderState state) => state.Stack.Push(new HashSet<object>());
 
     /// <summary>
-    ///     Pops the top-most items from the stack and adds them to the top collection.
+    /// Pops the top-most items from the stack and adds them to the top collection.
     /// </summary>
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.AddItems)]
@@ -68,29 +69,32 @@ internal static partial class PickleOperations {
     }
 
     /// <summary>
-    ///     Pushes an <see cref="ImmutableHashSet{T}" /> to the stack with the elements read from the stack.
+    /// Pushes an <see cref="ImmutableHashSet{T}" /> to the stack with the elements read from the stack.
     /// </summary>
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.FrozenSet)]
     public static void PushFrozenSet(PickleReaderState state) {
         List<object?> elements = PopMarkInternal(state);
-        state.Stack.Push(new HashSet<object?>(elements).ToImmutableHashSet());
+        state.Stack.Push(new HashSet<object?>(elements).ToFrozenSet());
     }
 
     /// <summary>
-    ///     Creates an new instance an object with the constructor arguments read from the stack.
+    /// Creates an new instance an object with the constructor arguments read from the stack.
     /// </summary>
     /// <remarks>Keyword-only arguments are python specific and not handled in this implementation.</remarks>
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.NewObjEx)]
     public static void NewObjEx(PickleReaderState state) {
-        _ = state.Stack.Pop(); // keyword-only arguments are a python specific thing.
+        Dictionary<string, object?> kwArgs = state.Stack.Pop<Dictionary<string, object?>>(); 
+        var args = state.Stack.Pop();
+        Type type = state.Stack.Pop<Type>();
+        state.Stack.Push(Instantiate(type, args?.GetType().IsArray == true ? args as object[] : [args], kwArgs));
         NewObj(state);
     }
 
     /// <summary>
-    ///     Pushes the type of a python object (which is mapped to a registered proxy object) with module and type name read
-    ///     from the stack as a string.
+    /// Pushes the type of a python object (which is mapped to a registered proxy object) with module and type name read
+    /// from the stack as a string.
     /// </summary>
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.StackGlobal)]
@@ -101,14 +105,14 @@ internal static partial class PickleOperations {
     }
 
     /// <summary>
-    ///     Stores the top-most element of the stack in the memo.
+    /// Stores the top-most element of the stack in the memo.
     /// </summary>
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     [PickleMethod(PickleOpCodes.Memoize)]
     public static void Memoize(PickleReaderState state) => state.Memo.Add(state.Memo.Count, state.Stack.Peek());
 
     /// <summary>
-    ///     Starts reading the frame from the stream.
+    /// Starts reading the frame from the stream.
     /// </summary>
     /// <param name="state">The current state of the <see cref="PickleReader"/> as a <see cref="PickleReaderState"/>.</param>
     /// <remarks>Frames are used to reduce the number of read calls, improving the performance by loading data chunkwise from the file.</remarks>

@@ -463,12 +463,15 @@ internal static partial class PickleOperations {
     /// </summary>
     /// <param name="type">The type to instantiate and which is a subclass of <seealso cref="PythonObject" />.</param>
     /// <param name="args">The arguments to pass.</param>
+    /// <param name="keywordArguments">The dictionary of keyword-arguments to pass to the object.</param>
     /// <returns>The instance of the specified type.</returns>
-    private static PythonObject Instantiate(Type type, params object?[]? args) {
+    private static PythonObject Instantiate(Type type, object?[]? args, Dictionary<string, object?>? keywordArguments = null) {
         if (!type.IsSubclassOf(typeof(PythonObject)))
             throw new ArgumentException($"The specified type must be a subclass of {typeof(PythonObject)}");
         if (args is null || args.Length == 0 || args.First() is object?[] { Length: 0 })
             return (Activator.CreateInstance(type) as PythonObject)!;
+        if (keywordArguments is not null)
+            return (Activator.CreateInstance(type, [args, keywordArguments]) as PythonObject)!;
         return (Activator.CreateInstance(type, args) as PythonObject)!;
     }
 
